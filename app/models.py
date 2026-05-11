@@ -7,7 +7,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class MovieBase(BaseModel):
+class MovieReviewBase(BaseModel):
     """Base schema for a movie review document."""
     title: str = Field(..., description="Movie title", min_length=1, max_length=300)
     reviewid: str = Field(..., description="External review identifier", min_length=1, max_length=100)
@@ -25,12 +25,12 @@ class MovieBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class MovieCreate(MovieBase):
-    """Schema for creating a new movie review document."""
+class MovieReviewCreate(MovieReviewBase):
+    """Schema for creating a movie review document."""
     pass
 
 
-class MovieUpdate(BaseModel):
+class MovieReviewUpdate(BaseModel):
     """Schema for updating a movie review document. All fields are optional."""
     title: Optional[str] = Field(None, description="Movie title", min_length=1, max_length=300)
     reviewid: Optional[str] = Field(None, description="External review identifier", min_length=1, max_length=100)
@@ -48,7 +48,7 @@ class MovieUpdate(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class MovieResponse(MovieBase):
+class MovieReviewResponse(MovieReviewBase):
     """Schema for movie review response."""
     id: str = Field(..., description="Unique identifier for the movie review")
     embedding: Optional[list[float]] = Field(None, description="Optional embedding payload if stored in the document")
@@ -56,9 +56,9 @@ class MovieResponse(MovieBase):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, extra="ignore")
 
 
-class MovieListResponse(BaseModel):
+class MovieReviewListResponse(BaseModel):
     """Schema for list of movie review documents."""
-    movies: list[MovieResponse] = Field(..., description="List of movie review documents")
+    movie_reviews: list[MovieReviewResponse] = Field(..., description="List of movie review documents")
     total: int = Field(..., description="Total number of movie review documents")
 
 
