@@ -10,12 +10,16 @@ This project is centered around movie review documents stored in AstraDB, where:
 
 ## What this demo is for
 
+This project focuses on the **retrieval** side of RAG.
+
+It assumes your movie review documents and their related embeddings are already present in AstraDB / Astra Vector DB. It does **not** focus on ingestion-time concerns such as chunking, embedding generation pipelines, or document preprocessing.
+
 Use this project to:
 
-- connect a local app to an AstraDB collection
+- connect a local app to an existing AstraDB collection
 - work with movie review documents through a simple API
-- prepare a dataset for vector and hybrid search experiments
-- validate document ingestion and retrieval before adding search endpoints
+- explore retrieval-oriented workflows for vector and hybrid search
+- validate the data access layer before adding dedicated RAG retrieval endpoints
 
 ## AstraDB collection
 
@@ -127,7 +131,6 @@ COLLECTION_NAME=movie_reviews
 2. Select your database
 3. Copy the API endpoint
 4. Create or use an application token
-5. confirm the keyspace name
 
 ## Run the app
 
@@ -144,65 +147,11 @@ Once running:
 
 The API works with the `movie_reviews` collection through the `movie_review` entity.
 
-Available endpoints:
-
-```text
-POST   /api/movie-reviews
-GET    /api/movie-reviews
-GET    /api/movie-reviews/{movie_review_id}
-PUT    /api/movie-reviews/{movie_review_id}
-DELETE /api/movie-reviews/{movie_review_id}
-```
-
-### Example create payload
-
-```json
-{
-  "title": "Inception",
-  "reviewid": "review-123",
-  "creationdate": "2024-01-01T12:00:00Z",
-  "criticname": "Jane Critic",
-  "originalscore": "4/5",
-  "reviewstate": "published",
-  "$vectorize": "A smart, visually striking sci-fi thriller with emotional depth."
-}
-```
-
-### Important API behavior
-
-- `$vectorize` can be sent on create/update
-- `$vector` is not accepted from clients
-- `$vector` is not returned by the API
-- AstraDB manages vector generation internally
-- `$vectorize` may not always be returned in read responses, depending on AstraDB document return behavior
-
-## Quick usage example
-
-### Create a movie review
-
-```bash
-curl -X POST http://localhost:8000/api/movie-reviews \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My First Movie",
-    "reviewid": "review-001",
-    "creationdate": "2024-01-01T12:00:00Z",
-    "criticname": "Alex Reviewer",
-    "originalscore": "3.5/5",
-    "reviewstate": "published",
-    "$vectorize": "A compelling drama with strong performances."
-  }'
-```
-
-### List movie reviews
-
-```bash
-curl http://localhost:8000/api/movie-reviews
-```
+For the full endpoint contract, payload examples, and response shapes, see [API.md](API.md).
 
 ## What’s next
 
-The next natural enhancement for this demo is search:
+Planned enhancements for this demo include:
 
 - vector search using the stored embeddings
 - keyword search over review text and metadata
@@ -240,3 +189,6 @@ Use Python 3.13 for local setup.
 ## License
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+---
+
+Built with [IBM Bob](https://bob.ibm.com/) as my pair-programming partner.
