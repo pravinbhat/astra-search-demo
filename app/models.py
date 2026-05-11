@@ -52,9 +52,8 @@ class MovieResponse(MovieBase):
     """Schema for movie review response."""
     id: str = Field(..., description="Unique identifier for the movie review")
     embedding: Optional[list[float]] = Field(None, description="Optional embedding payload if stored in the document")
-    vector: Optional[list[float]] = Field(None, alias="$vector", description="Stored Astra vector, if returned")
 
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, extra="ignore")
 
 
 class MovieListResponse(BaseModel):
