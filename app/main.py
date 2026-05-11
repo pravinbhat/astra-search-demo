@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import db_client
-from app.routers import health, items
+from app.routers import health, movies
 
 # Configure logging
 logging.basicConfig(
@@ -61,7 +61,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router)
-app.include_router(items.router)
+app.include_router(movies.router)
 
 
 @app.get("/", tags=["Root"])

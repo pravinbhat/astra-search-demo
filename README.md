@@ -26,7 +26,7 @@ astra-rag-demo/
 │   └── routers/
 │       ├── __init__.py
 │       ├── health.py        # Health check endpoint
-│       └── items.py         # Movie CRUD endpoints
+│       └── movies.py        # Movie CRUD endpoints
 ├── tests/
 │   ├── __init__.py
 │   └── test_api.py          # API tests

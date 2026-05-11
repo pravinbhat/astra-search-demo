@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     astra_db_api_endpoint: str
     astra_db_application_token: str
     astra_db_keyspace: str = "default_keyspace"
-    collection_name: str = "items"
+    collection_name: str = "movie_reviews"
     
     model_config = SettingsConfigDict(
         env_file=".env",

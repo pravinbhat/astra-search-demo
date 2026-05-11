@@ -133,10 +133,12 @@ class AstraDBClient:
             List of movies
         """
         try:
-            cursor = self.collection.find({}, skip=skip, limit=limit)
+            cursor = self.collection.find({}, limit=skip + limit)
             movies = []
             
-            for doc in cursor:
+            for index, doc in enumerate(cursor):
+                if index < skip:
+                    continue
                 doc["id"] = str(doc.pop("_id"))
                 movies.append(doc)
             
@@ -210,7 +212,7 @@ class AstraDBClient:
             Total count of movies
         """
         try:
-            return self.collection.count_documents({})
+            return self.collection.count_documents({}, upper_bound=1000000)
         except DataAPIException as e:
             logger.error(f"Failed to count movies: {str(e)}")
             return 0
