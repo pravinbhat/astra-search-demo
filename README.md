@@ -40,24 +40,68 @@ astra-rag-demo/
 
 ## Prerequisites
 
-- Python 3.14.4 or higher
+- Python 3.13 (Python 3.14 is not yet fully supported by all dependencies)
 - AstraDB account and database
 - AstraDB Application Token
 
 ## Setup
 
-### 1. Clone the Repository
+### Quick Setup (Recommended)
+
+Use the automated setup script:
+
+```bash
+# Make the script executable (if not already)
+chmod +x setup.sh
+
+# Run the setup script
+./setup.sh
+```
+
+The script will:
+- Check your Python version compatibility
+- Remove old virtual environment if it exists
+- Create a new virtual environment with the correct Python version
+- Install all dependencies
+- Create .env file from template
+
+### Manual Setup
+
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/pravinbhat/astra-rag-demo.git
 cd astra-rag-demo
 ```
 
-### 2. Create Virtual Environment
+#### 2. Check Python Version
+
+**IMPORTANT**: You must use Python 3.13. Python 3.14 is NOT supported.
 
 ```bash
-python -m venv venv
+# Check your Python version
+python3 --version
 
+# If you have Python 3.14, install a compatible version:
+# On macOS with Homebrew:
+brew install python@3.13
+
+# On Ubuntu/Debian:
+sudo apt install python3.13
+
+# On other systems, download from python.org
+```
+
+#### 3. Create Virtual Environment with Correct Python Version
+
+```bash
+# If you have multiple Python versions, specify the correct one:
+python3.13 -m venv venv
+
+# Or if python3 points to a compatible version (3.11-3.13):
+python3 -m venv venv
+
+# Activate the virtual environment:
 # On macOS/Linux (bash/zsh)
 source venv/bin/activate
 
@@ -66,15 +110,19 @@ source venv/bin/activate.fish
 
 # On Windows
 venv\Scripts\activate
+
+# Verify the Python version in the venv:
+python --version  # Should show 3.13.x
 ```
 
-### 3. Install Dependencies
+#### 4. Install Dependencies
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+#### 5. Configure Environment Variables
 
 Copy the example environment file and update with your AstraDB credentials:
 
