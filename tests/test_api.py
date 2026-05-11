@@ -40,100 +40,93 @@ class TestRootEndpoint:
         assert "health" in data
 
 
-class TestItemsEndpoint:
-    """Tests for items CRUD endpoints."""
+class TestMoviesEndpoint:
+    """Tests for movies CRUD endpoints."""
     
-    def test_list_items_empty(self):
-        """Test listing items returns empty list initially."""
-        response = client.get("/api/items")
+    def test_list_movies_empty(self):
+        """Test listing movies returns empty list initially."""
+        response = client.get("/api/movies")
         assert response.status_code == 200
         
         data = response.json()
-        assert "items" in data
+        assert "movies" in data
         assert "total" in data
-        assert isinstance(data["items"], list)
+        assert isinstance(data["movies"], list)
     
     @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_create_item(self):
-        """Test creating a new item."""
-        item_data = {
-            "name": "Test Item",
-            "description": "This is a test item",
+    def test_create_movie(self):
+        """Test creating a new movie."""
+        movie_data = {
+            "name": "Test Movie",
+            "description": "This is a test movie",
             "metadata": {"category": "test"}
         }
         
-        response = client.post("/api/items", json=item_data)
+        response = client.post("/api/movies", json=movie_data)
         assert response.status_code == 201
         
         data = response.json()
-        assert data["name"] == item_data["name"]
-        assert data["description"] == item_data["description"]
+        assert data["name"] == movie_data["name"]
+        assert data["description"] == movie_data["description"]
         assert "id" in data
         assert "created_at" in data
         assert "updated_at" in data
     
     @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_get_item(self):
-        """Test retrieving a specific item."""
-        # First create an item
-        item_data = {
-            "name": "Test Item",
-            "description": "This is a test item"
+    def test_get_movie(self):
+        """Test retrieving a specific movie."""
+        movie_data = {
+            "name": "Test Movie",
+            "description": "This is a test movie"
         }
-        create_response = client.post("/api/items", json=item_data)
-        item_id = create_response.json()["id"]
+        create_response = client.post("/api/movies", json=movie_data)
+        movie_id = create_response.json()["id"]
         
-        # Then retrieve it
-        response = client.get(f"/api/items/{item_id}")
+        response = client.get(f"/api/movies/{movie_id}")
         assert response.status_code == 200
         
         data = response.json()
-        assert data["id"] == item_id
-        assert data["name"] == item_data["name"]
+        assert data["id"] == movie_id
+        assert data["name"] == movie_data["name"]
     
     @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_update_item(self):
-        """Test updating an item."""
-        # First create an item
-        item_data = {
-            "name": "Test Item",
+    def test_update_movie(self):
+        """Test updating a movie."""
+        movie_data = {
+            "name": "Test Movie",
             "description": "Original description"
         }
-        create_response = client.post("/api/items", json=item_data)
-        item_id = create_response.json()["id"]
+        create_response = client.post("/api/movies", json=movie_data)
+        movie_id = create_response.json()["id"]
         
-        # Then update it
         update_data = {
             "description": "Updated description"
         }
-        response = client.put(f"/api/items/{item_id}", json=update_data)
+        response = client.put(f"/api/movies/{movie_id}", json=update_data)
         assert response.status_code == 200
         
         data = response.json()
         assert data["description"] == update_data["description"]
     
     @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_delete_item(self):
-        """Test deleting an item."""
-        # First create an item
-        item_data = {
-            "name": "Test Item",
+    def test_delete_movie(self):
+        """Test deleting a movie."""
+        movie_data = {
+            "name": "Test Movie",
             "description": "To be deleted"
         }
-        create_response = client.post("/api/items", json=item_data)
-        item_id = create_response.json()["id"]
+        create_response = client.post("/api/movies", json=movie_data)
+        movie_id = create_response.json()["id"]
         
-        # Then delete it
-        response = client.delete(f"/api/items/{item_id}")
+        response = client.delete(f"/api/movies/{movie_id}")
         assert response.status_code == 204
         
-        # Verify it's deleted
-        get_response = client.get(f"/api/items/{item_id}")
+        get_response = client.get(f"/api/movies/{movie_id}")
         assert get_response.status_code == 404
     
-    def test_get_nonexistent_item(self):
-        """Test retrieving a non-existent item returns 404."""
-        response = client.get("/api/items/nonexistent-id")
+    def test_get_nonexistent_movie(self):
+        """Test retrieving a non-existent movie returns 404."""
+        response = client.get("/api/movies/nonexistent-id")
         assert response.status_code == 404
 
 # Made with Bob

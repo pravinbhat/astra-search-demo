@@ -1,6 +1,6 @@
 # Astra RAG Demo
 
-A simple FastAPI application with AstraDB Data API integration for CRUD operations. This project serves as a foundation for building RAG (Retrieval-Augmented Generation) applications with search capabilities.
+A simple FastAPI application with AstraDB Data API integration for movie CRUD operations. This project serves as a foundation for building RAG (Retrieval-Augmented Generation) applications with search capabilities.
 
 ## Features
 
@@ -26,7 +26,7 @@ astra-rag-demo/
 │   └── routers/
 │       ├── __init__.py
 │       ├── health.py        # Health check endpoint
-│       └── items.py         # CRUD endpoints
+│       └── items.py         # Movie CRUD endpoints
 ├── tests/
 │   ├── __init__.py
 │   └── test_api.py          # API tests
@@ -136,7 +136,7 @@ Edit `.env` and add your AstraDB credentials:
 ASTRA_DB_API_ENDPOINT=https://your-database-id-your-region.apps.astra.datastax.com
 ASTRA_DB_APPLICATION_TOKEN=AstraCS:your-token-here
 ASTRA_DB_KEYSPACE=default_keyspace
-COLLECTION_NAME=items
+COLLECTION_NAME=movie_reviews
 ```
 
 #### Getting AstraDB Credentials
@@ -184,17 +184,17 @@ GET /
 
 Returns basic application information.
 
-### Items CRUD Operations
+### Movies CRUD Operations
 
-#### Create Item
+#### Create Movie
 
 ```bash
-POST /api/items
+POST /api/movies
 Content-Type: application/json
 
 {
-  "name": "Sample Item",
-  "description": "This is a sample item",
+  "name": "Sample Movie",
+  "description": "This is a sample movie",
   "metadata": {
     "category": "example",
     "tags": ["demo", "test"]
@@ -202,20 +202,20 @@ Content-Type: application/json
 }
 ```
 
-#### List Items
+#### List Movies
 
 ```bash
-GET /api/items?skip=0&limit=100
+GET /api/movies?skip=0&limit=100
 ```
 
 Query parameters:
-- `skip`: Number of items to skip (default: 0)
-- `limit`: Maximum number of items to return (default: 100, max: 1000)
+- `skip`: Number of movies to skip (default: 0)
+- `limit`: Maximum number of movies to return (default: 100, max: 1000)
 
-#### Get Item by ID
+#### Get Movie by ID
 
 ```bash
-GET /api/items/{item_id}
+GET /api/movies/{movie_id}
 ```
 
 #### Update Item

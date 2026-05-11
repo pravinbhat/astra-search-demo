@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="A simple FastAPI application with AstraDB Data API for CRUD operations",
+    description="A simple FastAPI application with AstraDB Data API for movie CRUD operations",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",

@@ -1,150 +1,148 @@
 """
-CRUD endpoints for items.
+CRUD endpoints for movies.
 """
 
-from typing import List
 from fastapi import APIRouter, HTTPException, status, Query
 
 from app.models import (
-    ItemCreate,
-    ItemUpdate,
-    ItemResponse,
-    ItemListResponse,
+    MovieCreate,
+    MovieUpdate,
+    MovieResponse,
+    MovieListResponse,
     ErrorResponse
 )
 from app.database import db_client
 
-router = APIRouter(prefix="/api/items", tags=["Items"])
+router = APIRouter(prefix="/api/movies", tags=["Movies"])
 
 
 @router.post(
     "",
-    response_model=ItemResponse,
+    response_model=MovieResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create Item",
-    description="Create a new item in the database",
+    summary="Create Movie",
+    description="Create a new movie in the database",
     responses={
-        201: {"description": "Item created successfully"},
+        201: {"description": "Movie created successfully"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     }
 )
-async def create_item(item: ItemCreate) -> ItemResponse:
+async def create_movie(movie: MovieCreate) -> MovieResponse:
     """
-    Create a new item.
+    Create a new movie.
     
     Args:
-        item: Item data to create
+        movie: Movie data to create
         
     Returns:
-        Created item with ID and timestamps
+        Created movie with ID and timestamps
         
     Raises:
-        HTTPException: If item creation fails
+        HTTPException: If movie creation fails
     """
-    item_data = item.model_dump()
-    result = await db_client.create_item(item_data)
+    movie_data = movie.model_dump()
+    result = await db_client.create_movie(movie_data)
     
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create item"
+            detail="Failed to create movie"
         )
     
-    return ItemResponse(**result)
+    return MovieResponse(**result)
 
 
 @router.get(
     "",
-    response_model=ItemListResponse,
+    response_model=MovieListResponse,
     status_code=status.HTTP_200_OK,
-    summary="List Items",
-    description="Retrieve a list of all items with pagination"
+    summary="List Movies",
+    description="Retrieve a list of all movies with pagination"
 )
-async def list_items(
-    skip: int = Query(0, ge=0, description="Number of items to skip"),
-    limit: int = Query(100, ge=1, le=1000, description="Maximum number of items to return")
-) -> ItemListResponse:
+async def list_movies(
+    skip: int = Query(0, ge=0, description="Number of movies to skip"),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of movies to return")
+) -> MovieListResponse:
     """
-    List all items with pagination.
+    List all movies with pagination.
     
     Args:
-        skip: Number of items to skip (for pagination)
-        limit: Maximum number of items to return
+        skip: Number of movies to skip (for pagination)
+        limit: Maximum number of movies to return
         
     Returns:
-        List of items with total count
+        List of movies with total count
     """
-    items = await db_client.list_items(skip=skip, limit=limit)
-    total = await db_client.count_items()
+    movies = await db_client.list_movies(skip=skip, limit=limit)
+    total = await db_client.count_movies()
     
-    return ItemListResponse(
-        items=[ItemResponse(**item) for item in items],
+    return MovieListResponse(
+        movies=[MovieResponse(**movie) for movie in movies],
         total=total
     )
 
 
 @router.get(
-    "/{item_id}",
-    response_model=ItemResponse,
+    "/{movie_id}",
+    response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get Item",
-    description="Retrieve a specific item by ID",
+    summary="Get Movie",
+    description="Retrieve a specific movie by ID",
     responses={
-        200: {"description": "Item found"},
-        404: {"model": ErrorResponse, "description": "Item not found"}
+        200: {"description": "Movie found"},
+        404: {"model": ErrorResponse, "description": "Movie not found"}
     }
 )
-async def get_item(item_id: str) -> ItemResponse:
+async def get_movie(movie_id: str) -> MovieResponse:
     """
-    Get a specific item by ID.
+    Get a specific movie by ID.
     
     Args:
-        item_id: ID of the item to retrieve
+        movie_id: ID of the movie to retrieve
         
     Returns:
-        Item data
+        Movie data
         
     Raises:
-        HTTPException: If item not found
+        HTTPException: If movie not found
     """
-    result = await db_client.get_item(item_id)
+    result = await db_client.get_movie(movie_id)
     
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Item with ID {item_id} not found"
+            detail=f"Movie with ID {movie_id} not found"
         )
     
-    return ItemResponse(**result)
+    return MovieResponse(**result)
 
 
 @router.put(
-    "/{item_id}",
-    response_model=ItemResponse,
+    "/{movie_id}",
+    response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
-    summary="Update Item",
-    description="Update an existing item by ID",
+    summary="Update Movie",
+    description="Update an existing movie by ID",
     responses={
-        200: {"description": "Item updated successfully"},
-        404: {"model": ErrorResponse, "description": "Item not found"}
+        200: {"description": "Movie updated successfully"},
+        404: {"model": ErrorResponse, "description": "Movie not found"}
     }
 )
-async def update_item(item_id: str, item: ItemUpdate) -> ItemResponse:
+async def update_movie(movie_id: str, movie: MovieUpdate) -> MovieResponse:
     """
-    Update an existing item.
+    Update an existing movie.
     
     Args:
-        item_id: ID of the item to update
-        item: Updated item data
+        movie_id: ID of the movie to update
+        movie: Updated movie data
         
     Returns:
-        Updated item data
+        Updated movie data
         
     Raises:
-        HTTPException: If item not found
+        HTTPException: If movie not found
     """
-    # Only include fields that were actually set
-    update_data = item.model_dump(exclude_unset=True)
+    update_data = movie.model_dump(exclude_unset=True)
     
     if not update_data:
         raise HTTPException(
@@ -152,43 +150,43 @@ async def update_item(item_id: str, item: ItemUpdate) -> ItemResponse:
             detail="No fields to update"
         )
     
-    result = await db_client.update_item(item_id, update_data)
+    result = await db_client.update_movie(movie_id, update_data)
     
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Item with ID {item_id} not found"
+            detail=f"Movie with ID {movie_id} not found"
         )
     
-    return ItemResponse(**result)
+    return MovieResponse(**result)
 
 
 @router.delete(
-    "/{item_id}",
+    "/{movie_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete Item",
-    description="Delete an item by ID",
+    summary="Delete Movie",
+    description="Delete a movie by ID",
     responses={
-        204: {"description": "Item deleted successfully"},
-        404: {"model": ErrorResponse, "description": "Item not found"}
+        204: {"description": "Movie deleted successfully"},
+        404: {"model": ErrorResponse, "description": "Movie not found"}
     }
 )
-async def delete_item(item_id: str) -> None:
+async def delete_movie(movie_id: str) -> None:
     """
-    Delete an item by ID.
+    Delete a movie by ID.
     
     Args:
-        item_id: ID of the item to delete
+        movie_id: ID of the movie to delete
         
     Raises:
-        HTTPException: If item not found
+        HTTPException: If movie not found
     """
-    success = await db_client.delete_item(item_id)
+    success = await db_client.delete_movie(movie_id)
     
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Item with ID {item_id} not found"
+            detail=f"Movie with ID {movie_id} not found"
         )
 
 # Made with Bob

@@ -7,39 +7,39 @@ from typing import Optional, Any, Dict
 from pydantic import BaseModel, Field
 
 
-class ItemBase(BaseModel):
-    """Base schema for Item."""
-    name: str = Field(..., description="Name of the item", min_length=1, max_length=100)
-    description: Optional[str] = Field(None, description="Description of the item", max_length=500)
+class MovieBase(BaseModel):
+    """Base schema for Movie."""
+    name: str = Field(..., description="Name of the movie", min_length=1, max_length=100)
+    description: Optional[str] = Field(None, description="Description of the movie", max_length=500)
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional metadata")
 
 
-class ItemCreate(ItemBase):
-    """Schema for creating a new item."""
+class MovieCreate(MovieBase):
+    """Schema for creating a new movie."""
     pass
 
 
-class ItemUpdate(BaseModel):
-    """Schema for updating an item. All fields are optional."""
-    name: Optional[str] = Field(None, description="Name of the item", min_length=1, max_length=100)
-    description: Optional[str] = Field(None, description="Description of the item", max_length=500)
+class MovieUpdate(BaseModel):
+    """Schema for updating a movie. All fields are optional."""
+    name: Optional[str] = Field(None, description="Name of the movie", min_length=1, max_length=100)
+    description: Optional[str] = Field(None, description="Description of the movie", max_length=500)
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
 
 
-class ItemResponse(ItemBase):
-    """Schema for item response."""
-    id: str = Field(..., description="Unique identifier for the item")
-    created_at: datetime = Field(..., description="Timestamp when the item was created")
-    updated_at: datetime = Field(..., description="Timestamp when the item was last updated")
+class MovieResponse(MovieBase):
+    """Schema for movie response."""
+    id: str = Field(..., description="Unique identifier for the movie")
+    created_at: datetime = Field(..., description="Timestamp when the movie was created")
+    updated_at: datetime = Field(..., description="Timestamp when the movie was last updated")
     
     class Config:
         from_attributes = True
 
 
-class ItemListResponse(BaseModel):
-    """Schema for list of items response."""
-    items: list[ItemResponse] = Field(..., description="List of items")
-    total: int = Field(..., description="Total number of items")
+class MovieListResponse(BaseModel):
+    """Schema for list of movies response."""
+    movies: list[MovieResponse] = Field(..., description="List of movies")
+    total: int = Field(..., description="Total number of movies")
 
 
 class HealthResponse(BaseModel):
