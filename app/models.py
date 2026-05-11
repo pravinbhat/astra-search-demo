@@ -3,43 +3,64 @@ Pydantic models for request/response validation.
 """
 
 from datetime import datetime
-from typing import Optional, Any, Dict
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class MovieBase(BaseModel):
-    """Base schema for Movie."""
-    name: str = Field(..., description="Name of the movie", min_length=1, max_length=100)
-    description: Optional[str] = Field(None, description="Description of the movie", max_length=500)
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional metadata")
+    """Base schema for a movie review document."""
+    title: str = Field(..., description="Movie title", min_length=1, max_length=300)
+    reviewid: str = Field(..., description="External review identifier", min_length=1, max_length=100)
+    creationdate: Optional[datetime] = Field(None, description="Review creation timestamp")
+    criticname: Optional[str] = Field(None, description="Name of the critic", max_length=200)
+    originalscore: Optional[str] = Field(None, description="Original score from the review source", max_length=100)
+    reviewstate: Optional[str] = Field(None, description="Review state", max_length=100)
+    vectorize_text: Optional[str] = Field(
+        None,
+        alias="$vectorize",
+        description="Review text used by AstraDB to generate embeddings",
+        min_length=1
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class MovieCreate(MovieBase):
-    """Schema for creating a new movie."""
+    """Schema for creating a new movie review document."""
     pass
 
 
 class MovieUpdate(BaseModel):
-    """Schema for updating a movie. All fields are optional."""
-    name: Optional[str] = Field(None, description="Name of the movie", min_length=1, max_length=100)
-    description: Optional[str] = Field(None, description="Description of the movie", max_length=500)
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+    """Schema for updating a movie review document. All fields are optional."""
+    title: Optional[str] = Field(None, description="Movie title", min_length=1, max_length=300)
+    reviewid: Optional[str] = Field(None, description="External review identifier", min_length=1, max_length=100)
+    creationdate: Optional[datetime] = Field(None, description="Review creation timestamp")
+    criticname: Optional[str] = Field(None, description="Name of the critic", max_length=200)
+    originalscore: Optional[str] = Field(None, description="Original score from the review source", max_length=100)
+    reviewstate: Optional[str] = Field(None, description="Review state", max_length=100)
+    vectorize_text: Optional[str] = Field(
+        None,
+        alias="$vectorize",
+        description="Review text used by AstraDB to generate embeddings",
+        min_length=1
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class MovieResponse(MovieBase):
-    """Schema for movie response."""
-    id: str = Field(..., description="Unique identifier for the movie")
-    created_at: datetime = Field(..., description="Timestamp when the movie was created")
-    updated_at: datetime = Field(..., description="Timestamp when the movie was last updated")
-    
-    class Config:
-        from_attributes = True
+    """Schema for movie review response."""
+    id: str = Field(..., description="Unique identifier for the movie review")
+    embedding: Optional[list[float]] = Field(None, description="Optional embedding payload if stored in the document")
+    vector: Optional[list[float]] = Field(None, alias="$vector", description="Stored Astra vector, if returned")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class MovieListResponse(BaseModel):
-    """Schema for list of movies response."""
-    movies: list[MovieResponse] = Field(..., description="List of movies")
-    total: int = Field(..., description="Total number of movies")
+    """Schema for list of movie review documents."""
+    movies: list[MovieResponse] = Field(..., description="List of movie review documents")
+    total: int = Field(..., description="Total number of movie review documents")
 
 
 class HealthResponse(BaseModel):

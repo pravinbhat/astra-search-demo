@@ -67,27 +67,39 @@ class AstraDBClient:
         """Check if client is connected to AstraDB."""
         return self._connected
     
+    def _ensure_collection(self):
+        """Return the active collection or raise if not connected."""
+        if self.collection is None:
+            raise RuntimeError("AstraDB collection is not initialized")
+        return self.collection
+
+    def _normalize_movie_document(self, doc: Dict[str, Any]) -> Dict[str, Any]:
+        """Map Astra document fields to API response fields."""
+        normalized = dict(doc)
+        normalized["id"] = str(normalized.pop("_id"))
+        return normalized
+
     async def create_movie(self, movie_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Create a new movie in the collection.
+        Create a new movie review document in the collection.
         
         Args:
-            movie_data: Dictionary containing movie data
+            movie_data: Dictionary containing movie review data
             
         Returns:
-            Created movie with ID and timestamps, or None if failed
+            Created movie review document, or None if failed
         """
         try:
-            now = datetime.utcnow()
-            document = {
-                **movie_data,
-                "created_at": now,
-                "updated_at": now
-            }
-            
-            result = self.collection.insert_one(document)
-            document["id"] = str(result.inserted_id)
-            return document
+            collection = self._ensure_collection()
+            document = dict(movie_data)
+            result = collection.insert_one(document)
+
+            created = collection.find_one({"_id": result.inserted_id})
+            if created:
+                return self._normalize_movie_document(created)
+
+            document["_id"] = result.inserted_id
+            return self._normalize_movie_document(document)
             
         except DataAPIException as e:
             logger.error(f"Failed to create movie: {str(e)}")
@@ -98,20 +110,20 @@ class AstraDBClient:
     
     async def get_movie(self, movie_id: str) -> Optional[Dict[str, Any]]:
         """
-        Retrieve a movie by ID.
+        Retrieve a movie review document by ID.
         
         Args:
-            movie_id: ID of the movie to retrieve
+            movie_id: ID of the movie review to retrieve
             
         Returns:
-            Movie data or None if not found
+            Movie review data or None if not found
         """
         try:
-            result = self.collection.find_one({"_id": movie_id})
+            collection = self._ensure_collection()
+            result = collection.find_one({"_id": movie_id})
             
             if result:
-                result["id"] = str(result.pop("_id"))
-                return result
+                return self._normalize_movie_document(result)
             return None
             
         except DataAPIException as e:
@@ -123,24 +135,26 @@ class AstraDBClient:
     
     async def list_movies(self, skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
         """
-        List all movies with pagination.
+        List movie review documents with pagination.
         
         Args:
-            skip: Number of movies to skip
-            limit: Maximum number of movies to return
+            skip: Number of movie review documents to skip
+            limit: Maximum number of movie review documents to return
             
         Returns:
-            List of movies
+            List of movie review documents
         """
         try:
-            cursor = self.collection.find({}, limit=skip + limit)
+            collection = self._ensure_collection()
+            cursor = collection.find({}, limit=skip + limit)
             movies = []
             
             for index, doc in enumerate(cursor):
                 if index < skip:
                     continue
-                doc["id"] = str(doc.pop("_id"))
-                movies.append(doc)
+                movies.append(self._normalize_movie_document(doc))
+                if len(movies) >= limit:
+                    break
             
             return movies
             
@@ -153,27 +167,25 @@ class AstraDBClient:
     
     async def update_movie(self, movie_id: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Update a movie by ID.
+        Update a movie review document by ID.
         
         Args:
-            movie_id: ID of the movie to update
+            movie_id: ID of the movie review to update
             update_data: Dictionary containing fields to update
             
         Returns:
-            Updated movie or None if not found
+            Updated movie review document or None if not found
         """
         try:
-            update_data["updated_at"] = datetime.utcnow()
-            
-            result = self.collection.find_one_and_update(
+            collection = self._ensure_collection()
+            result = collection.find_one_and_update(
                 {"_id": movie_id},
                 {"$set": update_data},
                 return_document="after"
             )
             
             if result:
-                result["id"] = str(result.pop("_id"))
-                return result
+                return self._normalize_movie_document(result)
             return None
             
         except DataAPIException as e:
@@ -194,7 +206,8 @@ class AstraDBClient:
             True if deleted, False otherwise
         """
         try:
-            result = self.collection.delete_one({"_id": movie_id})
+            collection = self._ensure_collection()
+            result = collection.delete_one({"_id": movie_id})
             return result.deleted_count > 0
             
         except DataAPIException as e:
@@ -212,7 +225,8 @@ class AstraDBClient:
             Total count of movies
         """
         try:
-            return self.collection.count_documents({}, upper_bound=1000000)
+            collection = self._ensure_collection()
+            return collection.count_documents({}, upper_bound=1000000)
         except DataAPIException as e:
             logger.error(f"Failed to count movies: {str(e)}")
             return 0

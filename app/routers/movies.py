@@ -1,5 +1,5 @@
 """
-CRUD endpoints for movies.
+CRUD endpoints for movie review documents.
 """
 
 from fastapi import APIRouter, HTTPException, status, Query
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api/movies", tags=["Movies"])
     response_model=MovieResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create Movie",
-    description="Create a new movie in the database",
+    description="Create a new movie review document in the database",
     responses={
         201: {"description": "Movie created successfully"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
@@ -29,13 +29,13 @@ router = APIRouter(prefix="/api/movies", tags=["Movies"])
 )
 async def create_movie(movie: MovieCreate) -> MovieResponse:
     """
-    Create a new movie.
+    Create a new movie review document.
     
     Args:
         movie: Movie data to create
         
     Returns:
-        Created movie with ID and timestamps
+        Created movie review document
         
     Raises:
         HTTPException: If movie creation fails
@@ -57,21 +57,21 @@ async def create_movie(movie: MovieCreate) -> MovieResponse:
     response_model=MovieListResponse,
     status_code=status.HTTP_200_OK,
     summary="List Movies",
-    description="Retrieve a list of all movies with pagination"
+    description="Retrieve a list of movie review documents with pagination"
 )
 async def list_movies(
     skip: int = Query(0, ge=0, description="Number of movies to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of movies to return")
 ) -> MovieListResponse:
     """
-    List all movies with pagination.
+    List movie review documents with pagination.
     
     Args:
         skip: Number of movies to skip (for pagination)
         limit: Maximum number of movies to return
         
     Returns:
-        List of movies with total count
+        List of movie review documents with total count
     """
     movies = await db_client.list_movies(skip=skip, limit=limit)
     total = await db_client.count_movies()
@@ -87,7 +87,7 @@ async def list_movies(
     response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
     summary="Get Movie",
-    description="Retrieve a specific movie by ID",
+    description="Retrieve a specific movie review document by ID",
     responses={
         200: {"description": "Movie found"},
         404: {"model": ErrorResponse, "description": "Movie not found"}
@@ -95,13 +95,13 @@ async def list_movies(
 )
 async def get_movie(movie_id: str) -> MovieResponse:
     """
-    Get a specific movie by ID.
+    Get a specific movie review document by ID.
     
     Args:
         movie_id: ID of the movie to retrieve
         
     Returns:
-        Movie data
+        Movie review document data
         
     Raises:
         HTTPException: If movie not found
@@ -122,7 +122,7 @@ async def get_movie(movie_id: str) -> MovieResponse:
     response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
     summary="Update Movie",
-    description="Update an existing movie by ID",
+    description="Update an existing movie review document by ID",
     responses={
         200: {"description": "Movie updated successfully"},
         404: {"model": ErrorResponse, "description": "Movie not found"}
@@ -130,14 +130,14 @@ async def get_movie(movie_id: str) -> MovieResponse:
 )
 async def update_movie(movie_id: str, movie: MovieUpdate) -> MovieResponse:
     """
-    Update an existing movie.
+    Update an existing movie review document.
     
     Args:
         movie_id: ID of the movie to update
         movie: Updated movie data
         
     Returns:
-        Updated movie data
+        Updated movie review document data
         
     Raises:
         HTTPException: If movie not found
@@ -165,7 +165,7 @@ async def update_movie(movie_id: str, movie: MovieUpdate) -> MovieResponse:
     "/{movie_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete Movie",
-    description="Delete a movie by ID",
+    description="Delete a movie review document by ID",
     responses={
         204: {"description": "Movie deleted successfully"},
         404: {"model": ErrorResponse, "description": "Movie not found"}
@@ -173,7 +173,7 @@ async def update_movie(movie_id: str, movie: MovieUpdate) -> MovieResponse:
 )
 async def delete_movie(movie_id: str) -> None:
     """
-    Delete a movie by ID.
+    Delete a movie review document by ID.
     
     Args:
         movie_id: ID of the movie to delete

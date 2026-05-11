@@ -184,56 +184,59 @@ GET /
 
 Returns basic application information.
 
-### Movies CRUD Operations
+### Movie Reviews CRUD Operations
 
-#### Create Movie
+The API maps to documents in the `movie_reviews` AstraDB collection.
+
+#### Create Movie Review
 
 ```bash
 POST /api/movies
 Content-Type: application/json
 
 {
-  "name": "Sample Movie",
-  "description": "This is a sample movie",
-  "metadata": {
-    "category": "example",
-    "tags": ["demo", "test"]
-  }
+  "title": "Inception",
+  "reviewid": "review-123",
+  "creationdate": "2024-01-01T12:00:00Z",
+  "criticname": "Jane Critic",
+  "originalscore": "4/5",
+  "reviewstate": "published",
+  "$vectorize": "A smart, visually striking sci-fi thriller with emotional depth."
 }
 ```
 
-#### List Movies
+#### List Movie Reviews
 
 ```bash
 GET /api/movies?skip=0&limit=100
 ```
 
 Query parameters:
-- `skip`: Number of movies to skip (default: 0)
-- `limit`: Maximum number of movies to return (default: 100, max: 1000)
+- `skip`: Number of movie review documents to skip (default: 0)
+- `limit`: Maximum number of movie review documents to return (default: 100, max: 1000)
 
-#### Get Movie by ID
+#### Get Movie Review by ID
 
 ```bash
 GET /api/movies/{movie_id}
 ```
 
-#### Update Item
+#### Update Movie Review
 
 ```bash
-PUT /api/items/{item_id}
+PUT /api/movies/{movie_id}
 Content-Type: application/json
 
 {
-  "name": "Updated Item Name",
-  "description": "Updated description"
+  "reviewstate": "approved",
+  "$vectorize": "Updated review text for the embedding source."
 }
 ```
 
-#### Delete Item
+#### Delete Movie Review
 
 ```bash
-DELETE /api/items/{item_id}
+DELETE /api/movies/{movie_id}
 ```
 
 ## Testing
@@ -275,28 +278,32 @@ Once the application is running, you can access:
 # Health check
 curl http://localhost:8000/health
 
-# Create an item
-curl -X POST http://localhost:8000/api/items \
+# Create a movie review
+curl -X POST http://localhost:8000/api/movies \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "My First Item",
-    "description": "Testing the API",
-    "metadata": {"priority": "high"}
+    "title": "My First Movie",
+    "reviewid": "review-001",
+    "creationdate": "2024-01-01T12:00:00Z",
+    "criticname": "Alex Reviewer",
+    "originalscore": "3.5/5",
+    "reviewstate": "published",
+    "$vectorize": "A compelling drama with strong performances."
   }'
 
-# List all items
-curl http://localhost:8000/api/items
+# List all movie reviews
+curl http://localhost:8000/api/movies
 
-# Get specific item (replace {item_id} with actual ID)
-curl http://localhost:8000/api/items/{item_id}
+# Get specific movie review (replace {movie_id} with actual ID)
+curl http://localhost:8000/api/movies/{movie_id}
 
-# Update item
-curl -X PUT http://localhost:8000/api/items/{item_id} \
+# Update movie review
+curl -X PUT http://localhost:8000/api/movies/{movie_id} \
   -H "Content-Type: application/json" \
-  -d '{"description": "Updated description"}'
+  -d '{"reviewstate": "approved"}'
 
-# Delete item
-curl -X DELETE http://localhost:8000/api/items/{item_id}
+# Delete movie review
+curl -X DELETE http://localhost:8000/api/movies/{movie_id}
 ```
 
 ### Using Python
@@ -306,31 +313,35 @@ import requests
 
 BASE_URL = "http://localhost:8000"
 
-# Create an item
+# Create a movie review
 response = requests.post(
-    f"{BASE_URL}/api/items",
+    f"{BASE_URL}/api/movies",
     json={
-        "name": "Python Item",
-        "description": "Created from Python",
-        "metadata": {"source": "python-script"}
+        "title": "Python Movie",
+        "reviewid": "review-python-001",
+        "creationdate": "2024-01-01T12:00:00Z",
+        "criticname": "Python Critic",
+        "originalscore": "8/10",
+        "reviewstate": "draft",
+        "$vectorize": "Created from Python using the movie reviews API."
     }
 )
-item = response.json()
-print(f"Created item: {item['id']}")
+movie = response.json()
+print(f"Created movie review: {movie['id']}")
 
-# Get the item
-response = requests.get(f"{BASE_URL}/api/items/{item['id']}")
+# Get the movie review
+response = requests.get(f"{BASE_URL}/api/movies/{movie['id']}")
 print(response.json())
 
-# Update the item
+# Update the movie review
 response = requests.put(
-    f"{BASE_URL}/api/items/{item['id']}",
-    json={"description": "Updated from Python"}
+    f"{BASE_URL}/api/movies/{movie['id']}",
+    json={"reviewstate": "published"}
 )
 print(response.json())
 
-# Delete the item
-response = requests.delete(f"{BASE_URL}/api/items/{item['id']}")
+# Delete the movie review
+response = requests.delete(f"{BASE_URL}/api/movies/{movie['id']}")
 print(f"Deleted: {response.status_code == 204}")
 ```
 
