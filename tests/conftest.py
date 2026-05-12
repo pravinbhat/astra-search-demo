@@ -3,7 +3,8 @@ Pytest configuration and shared fixtures for tests.
 """
 
 import pytest
-from app.database import db_client
+from app.config import settings
+from app.database import astra_connection_manager, library_book_repository
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -14,8 +15,8 @@ def setup_database():
     The database credentials are loaded from the .env file via app.config.settings.
     """
     # Connect to the database using credentials from .env file
-    if not db_client.is_connected():
-        success = db_client.connect()
+    if not astra_connection_manager.is_connected():
+        success = astra_connection_manager.connect()
         if not success:
             pytest.fail(
                 "Failed to connect to AstraDB. "
@@ -25,6 +26,9 @@ def setup_database():
                 "  - ASTRA_DB_KEYSPACE\n"
                 "  - COLLECTION_NAME"
             )
+
+        collection = astra_connection_manager.ensure_collection(settings.collection_name)
+        library_book_repository.set_collection(collection)
     
     yield
     
@@ -57,7 +61,7 @@ async def cleanup_test_books():
     # Cleanup: delete all books created during the test
     for book_id in created_book_ids:
         try:
-            await db_client.delete_library_book(book_id)
+            await library_book_repository.delete_library_book(book_id)
         except Exception as e:
             print(f"Warning: Failed to cleanup book {book_id}: {e}")
 

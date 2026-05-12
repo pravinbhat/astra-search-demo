@@ -12,7 +12,7 @@ from app.models import (
     LibraryBookSearchRequest,
     ErrorResponse
 )
-from app.database import db_client
+from app.database import library_book_repository
 
 router = APIRouter(prefix="/api/library-books", tags=["Library Books"])
 
@@ -42,7 +42,7 @@ async def create_library_book(library_book: LibraryBookCreate) -> LibraryBookRes
         HTTPException: If library book creation fails
     """
     library_book_data = library_book.model_dump(by_alias=True, exclude_none=True)
-    result = await db_client.create_library_book(library_book_data)
+    result = await library_book_repository.create_library_book(library_book_data)
     
     if result is None:
         raise HTTPException(
@@ -74,8 +74,8 @@ async def list_library_books(
     Returns:
         List of library book documents with total count
     """
-    library_books = await db_client.list_library_books(skip=skip, limit=limit)
-    total = await db_client.count_library_books()
+    library_books = await library_book_repository.list_library_books(skip=skip, limit=limit)
+    total = await library_book_repository.count_library_books()
     
     return LibraryBookListResponse(
         library_books=[LibraryBookResponse(**library_book) for library_book in library_books],
@@ -125,14 +125,14 @@ async def search_library_books(search_filter: LibraryBookSearchRequest) -> Libra
     try:
         query = search_filter.query.strip() if search_filter.query else None
         if query:
-            library_books, total = await db_client.semantic_search_library_books(
+            library_books, total = await library_book_repository.semantic_search_library_books(
                 query=query,
                 filter_predicates=search_filter.filter,
                 skip=search_filter.skip,
                 limit=search_filter.limit
             )
         else:
-            library_books, total = await db_client.search_library_books(
+            library_books, total = await library_book_repository.search_library_books(
                 filter_predicates=search_filter.filter,
                 skip=search_filter.skip,
                 limit=search_filter.limit
@@ -173,7 +173,7 @@ async def get_library_book(library_book_id: str) -> LibraryBookResponse:
     Raises:
         HTTPException: If library book not found
     """
-    result = await db_client.get_library_book(library_book_id)
+    result = await library_book_repository.get_library_book(library_book_id)
     
     if result is None:
         raise HTTPException(
@@ -217,7 +217,7 @@ async def update_library_book(library_book_id: str, library_book: LibraryBookUpd
             detail="No fields to update"
         )
     
-    result = await db_client.update_library_book(library_book_id, update_data)
+    result = await library_book_repository.update_library_book(library_book_id, update_data)
     
     if result is None:
         raise HTTPException(
@@ -248,7 +248,7 @@ async def delete_library_book(library_book_id: str) -> None:
     Raises:
         HTTPException: If library book not found
     """
-    success = await db_client.delete_library_book(library_book_id)
+    success = await library_book_repository.delete_library_book(library_book_id)
     
     if not success:
         raise HTTPException(

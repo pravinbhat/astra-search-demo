@@ -6,7 +6,7 @@ from fastapi import APIRouter, status
 
 from app.models import HealthResponse
 from app.config import settings
-from app.database import db_client
+from app.database import astra_connection_manager
 
 router = APIRouter(tags=["Health"])
 
@@ -29,7 +29,7 @@ async def health_check() -> HealthResponse:
         status="healthy",
         app_name=settings.app_name,
         version=settings.app_version,
-        astra_db_connected=db_client.is_connected()
+        astra_db_connected=astra_connection_manager.is_connected()
     )
 
 # Made with Bob

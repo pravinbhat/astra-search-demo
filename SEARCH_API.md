@@ -4,6 +4,14 @@
 
 The search endpoint allows you to query library books using filter predicates, semantic queries, or both, powered by AstraDB's Data API via the astrapy package.
 
+## Search Modes
+
+| Mode                       | Use Case                                        | Request Fields     | Example                                     |
+| ----------------------------| -------------------------------------------------| --------------------| ---------------------------------------------|
+| **Filter Search**          | Query by metadata (author, genre, rating, etc.) | `filter` only      | Find all books by "John Anthony"            |
+| **Semantic Search**        | Query by meaning/concepts                       | `query` only       | Find "books about resilience and survival"  |
+| **Semantic Filter Search** | Combine semantic + metadata constraints         | `filter` + `query` | Find sci-fi books about "space exploration" |
+
 ## Endpoint
 
 **POST** `/api/library-books/search`

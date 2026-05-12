@@ -1,5 +1,11 @@
 # Setup
 
+## Prerequisites
+
+- Python 3.13 or higher
+- An AstraDB account with a database created
+- Application token with appropriate permissions
+
 ## Quick setup
 
 ```bash
@@ -169,4 +175,8 @@ The test suite uses fixtures defined in `tests/conftest.py` for:
 - Automatic cleanup of test data
 - Isolated test execution
 - Database state management
-- Swagger docs: `http://localhost:8000/docs`
+
+## Additional Resources
+
+- Interactive API documentation: `http://localhost:8000/docs`
+- See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions

@@ -8,16 +8,16 @@ This document contains the API contract for working with the `library_books` col
 http://localhost:8000
 ```
 
-## Endpoints
+## Endpoints Quick Reference
 
-```text
-POST   /api/library-books
-GET    /api/library-books
-GET    /api/library-books/{library_book_id}
-PUT    /api/library-books/{library_book_id}
-DELETE /api/library-books/{library_book_id}
-POST   /api/library-books/search
-```
+| Method | Endpoint | Description | Status Codes |
+|--------|----------|-------------|--------------|
+| POST | `/api/library-books` | Create a new library book | 201, 500 |
+| GET | `/api/library-books` | List library books with pagination | 200 |
+| GET | `/api/library-books/{id}` | Get a specific library book | 200, 404 |
+| PUT | `/api/library-books/{id}` | Update a library book | 200, 404 |
+| DELETE | `/api/library-books/{id}` | Delete a library book | 204, 404 |
+| POST | `/api/library-books/search` | Search library books | 200, 500 |
 
 > **Note:** For detailed documentation on the search endpoint including filter search, semantic search, semantic filter search, operators, and examples, see [SEARCH_API.md](SEARCH_API.md).
 

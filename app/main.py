@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import db_client
+from app.database import astra_connection_manager, library_book_repository
 from app.routers import health, books
 
 # Configure logging
@@ -27,9 +27,11 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting up application...")
     
-    # Connect to AstraDB
-    if db_client.connect():
-        logger.info("Successfully connected to AstraDB")
+    # Connect to AstraDB and initialize the application collection explicitly
+    if astra_connection_manager.connect():
+        collection = astra_connection_manager.ensure_collection(settings.collection_name)
+        library_book_repository.set_collection(collection)
+        logger.info(f"Successfully initialized AstraDB collection: {settings.collection_name}")
     else:
         logger.error("Failed to connect to AstraDB")
     

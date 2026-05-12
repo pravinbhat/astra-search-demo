@@ -8,6 +8,23 @@ This project is centered around library book documents stored in AstraDB, where:
 - AstraDB's vectorize feature automatically generates and stores embeddings in the SaaS DB layer
 - the collection can be used for semantic or hybrid retrieval workflows
 
+## Quick Start
+
+```bash
+# 1. Setup and configure
+./setup.sh
+# Edit .env with your AstraDB credentials
+
+# 2. Create collection and load data
+python scripts/db_create_collection.py
+python scripts/db_hydrate_collection.py
+
+# 3. Run the API
+uvicorn app.main:app --reload
+```
+
+See [SETUP.md](SETUP.md) for detailed instructions.
+
 ## What this demo is for
 
 This project focuses on **search and retrieval** workflows.
@@ -92,14 +109,22 @@ This demo sets up the collection and API shape needed for those next steps.
 - [API.md](API.md) — endpoint contract, payloads, and response examples
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — common issues and fixes
 
-## What’s next
+## What's next
 
-Planned enhancements for this demo include:
+This demo currently includes:
 
-- vector search using the stored embeddings
-- keyword search over review text and metadata
-- hybrid search combining both approaches
-- optional metadata filtering by critic, review state, score, or title
+- ✅ Semantic vector search using AstraDB's `$vectorize` feature
+- ✅ Filter-based search with predicate operators
+- ✅ Semantic filter search combining vector search with metadata filters
+- ✅ Metadata filtering by author, genres, rating, publication year, checkout status, and more
+
+See [SEARCH_API.md](SEARCH_API.md) for complete search endpoint documentation.
+
+Potential future enhancements:
+
+- Lexical search using AstraDB's `$lexical` operator for keyword matching
+- Hybrid search combining vector, lexical, and filter approaches using `$hybrid`
+- Search result relevance tuning (using reranker)
 
 ## Resources
 
