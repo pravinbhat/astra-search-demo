@@ -297,3 +297,16 @@ class LibraryBookRepository:
 
 astra_connection_manager = AstraConnectionManager()
 library_book_repository = LibraryBookRepository(collection=None)
+
+
+def get_connected_database():
+    """Connect to AstraDB and return the active database handle."""
+    if not astra_connection_manager.is_connected():
+        if not astra_connection_manager.connect():
+            raise RuntimeError("Failed to connect to AstraDB")
+
+    database = astra_connection_manager.database
+    if database is None:
+        raise RuntimeError("AstraDB database is not initialized after connection")
+
+    return database

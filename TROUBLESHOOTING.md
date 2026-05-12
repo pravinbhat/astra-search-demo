@@ -7,7 +7,7 @@ If you're experiencing issues, check these first:
 1. Verify `.env` file exists and contains all required variables
 2. Ensure Python 3.13 is being used: `python --version`
 3. Check AstraDB console to confirm database is active
-4. Verify collection exists: `python scripts/db_connect.py`
+4. Verify collection setup by running: `python -m scripts.db_create_collection`
 
 ## Collection not found
 
@@ -21,7 +21,7 @@ COLLECTION_NAME=library_books
 
 Then create the collection:
 ```bash
-python scripts/db_create_collection.py
+python -m scripts.db_create_collection
 ```
 
 ## AstraDB connection issues
@@ -67,7 +67,7 @@ python scripts/db_create_collection.py
 - Ensure collection exists before running hydration script
 - Check that `data/quickstart_dataset.json` exists and is valid JSON
 - Verify sufficient database capacity/limits
-- Run with verbose output: `python scripts/db_hydrate_collection.py -v`
+- Re-run `python -m scripts.db_create_collection` before hydrating if collection setup is uncertain
 
 ## Python version issues
 

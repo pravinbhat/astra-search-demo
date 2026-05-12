@@ -15,10 +15,14 @@ class Settings(BaseSettings):
     debug: bool = True
     
     # AstraDB settings
-    astra_db_api_endpoint: str
-    astra_db_application_token: str
+    astra_db_api_endpoint: str = ""
+    astra_db_application_token: str = ""
     astra_db_keyspace: str = "default_keyspace"
     collection_name: str = "library_books"
+
+    # Embedding settings
+    embedding_provider: str = "nvidia"
+    embedding_model_name: str = "NV-Embed-QA"
     
     model_config = SettingsConfigDict(
         env_file=".env",

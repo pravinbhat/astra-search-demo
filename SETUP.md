@@ -63,7 +63,7 @@ ASTRA_DB_APPLICATION_TOKEN=AstraCS:your-token-here
 ASTRA_DB_KEYSPACE=default_keyspace
 COLLECTION_NAME=library_books
 
-# Embedding Configuration (for vectorize feature)
+# Embedding configuration (shared by app and ingestion scripts)
 EMBEDDING_PROVIDER=nvidia
 EMBEDDING_MODEL_NAME=nvidia/nv-embedqa-e5-v5
 ```
@@ -81,26 +81,27 @@ The project includes scripts to create and hydrate the `library_books` collectio
 
 ### 1. Create the collection
 
-Run the collection creation script to set up the `library_books` collection with vectorize enabled:
+Run the collection creation script as a module to set up the `library_books` collection with vectorize enabled:
 
 ```bash
-python scripts/db_create_collection.py
+python -m scripts.db_create_collection
 ```
 
 This script:
+- Reuses shared app configuration and AstraDB connection helpers
 - Creates a collection with COSINE vector metric
-- Configures AstraDB's vectorize feature with NVIDIA embeddings
-- Uses the embedding provider and model specified in your `.env` file
+- Configures AstraDB's vectorize feature with the embedding provider and model specified in your `.env` file
 
 ### 2. Hydrate the collection
 
-Load the sample library books dataset into the collection:
+Load the sample library books dataset into the collection by running the hydration script as a module:
 
 ```bash
-python scripts/db_hydrate_collection.py
+python -m scripts.db_hydrate_collection
 ```
 
 This script:
+- Reuses shared helpers for collection access, file loading, and document preparation
 - Reads book data from `data/quickstart_dataset.json`
 - Transforms the data and adds `$vectorize` fields (summary + genres)
 - Inserts documents into the collection

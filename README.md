@@ -16,8 +16,8 @@ This project is centered around library book documents stored in AstraDB, where:
 # Edit .env with your AstraDB credentials
 
 # 2. Create collection and load data
-python scripts/db_create_collection.py
-python scripts/db_hydrate_collection.py
+python -m scripts.db_create_collection
+python -m scripts.db_hydrate_collection
 
 # 3. Run the API
 uvicorn app.main:app --reload
