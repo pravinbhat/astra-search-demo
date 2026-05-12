@@ -103,12 +103,15 @@ Planned enhancements for this demo include:
 
 ## Resources
 
-- [AstraDB Documentation](https://docs.datastax.com/en/astra/home/astra.html)
-- [AstraDB Python Client](https://docs.datastax.com/en/astra-serverless/docs/develop/dev-with-python.html)
+- [AstraDB Quickstart: Build Hybrid Search Collections](https://docs.datastax.com/en/astra-db-serverless/get-started/quickstart.html)
+- [Master Search Techniques: Vector, Lexical & Hybrid](https://docs.datastax.com/en/astra-db-serverless/databases/about-search.html)
+- [Collections API Reference: $vector, $vectorize, $lexical, $hybrid](https://docs.datastax.com/en/astra-db-serverless/api-reference/collections.html)
+- [Automatic Embedding Generation with AstraDB](https://docs.datastax.com/en/astra-db-serverless/databases/embedding-generation.html)
 
 ## License
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+
 ---
 
 Built with [IBM Bob](https://bob.ibm.com/) as my pair-programming partner.
