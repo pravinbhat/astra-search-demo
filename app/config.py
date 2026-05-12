@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Application settings
-    app_name: str = "Astra RAG Demo"
+    app_name: str = "Astra Search Demo"
     app_version: str = "1.0.0"
     debug: bool = True
     

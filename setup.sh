@@ -1,9 +1,9 @@
 #!/bin/bash
-# Setup script for astra-rag-demo
+# Setup script for astra-search-demo
 
 set -e
 
-echo "🚀 Setting up Astra RAG Demo..."
+echo "🚀 Setting up Astra Search Demo..."
 
 # Function to check if a Python version is compatible
 check_python_version() {

@@ -1,5 +1,5 @@
 """
-Astra RAG Demo - FastAPI Application
+Astra Search Demo - FastAPI Application
 """
 
 __version__ = "1.0.0"

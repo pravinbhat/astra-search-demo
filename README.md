@@ -1,4 +1,4 @@
-# Astra RAG Demo
+# Astra Search Demo
 
 A lightweight demo app for working with AstraDB and a `library_books` collection prepared for vector and hybrid search use cases.
 
@@ -10,7 +10,7 @@ This project is centered around library book documents stored in AstraDB, where:
 
 ## What this demo is for
 
-This project focuses on the **retrieval** side of RAG.
+This project focuses on **search and retrieval** workflows.
 
 It includes data ingestion scripts to hydrate the collection with a sample library books dataset. However, it does **not** implement AI features like document processing, chunking, or custom embedding pipelines. Instead, it leverages AstraDB's built-in `vectorize` feature to auto-generate embeddings directly in the database layer.
 
@@ -20,7 +20,7 @@ Use this project to:
 - connect a local app to the AstraDB collection
 - work with library book documents through a simple API
 - explore retrieval-oriented workflows for vector and hybrid search
-- validate the data access layer before adding dedicated RAG retrieval endpoints
+- validate the data access layer before adding dedicated search retrieval endpoints
 
 ## Data Ingestion
 
