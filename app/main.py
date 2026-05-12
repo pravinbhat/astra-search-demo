@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import db_client
-from app.routers import health, movies
+from app.routers import health, books
 
 # Configure logging
 logging.basicConfig(
@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="A simple FastAPI application with AstraDB Data API for movie CRUD operations",
+    description="A simple FastAPI application with AstraDB Data API for library book CRUD operations",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -61,7 +61,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router)
-app.include_router(movies.router)
+app.include_router(books.router)
 
 
 @app.get("/", tags=["Root"])

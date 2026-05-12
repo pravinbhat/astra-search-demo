@@ -5,7 +5,7 @@
 Make sure your `.env` contains:
 
 ```env
-COLLECTION_NAME=movie_reviews
+COLLECTION_NAME=library_books
 ```
 
 ## AstraDB connection issues

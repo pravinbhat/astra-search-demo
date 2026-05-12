@@ -3,63 +3,73 @@ Pydantic models for request/response validation.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class MovieReviewBase(BaseModel):
-    """Base schema for a movie review document."""
-    title: str = Field(..., description="Movie title", min_length=1, max_length=300)
-    reviewid: str = Field(..., description="External review identifier", min_length=1, max_length=100)
-    creationdate: Optional[datetime] = Field(None, description="Review creation timestamp")
-    criticname: Optional[str] = Field(None, description="Name of the critic", max_length=200)
-    originalscore: Optional[str] = Field(None, description="Original score from the review source", max_length=100)
-    reviewstate: Optional[str] = Field(None, description="Review state", max_length=100)
+class LibraryBookBase(BaseModel):
+    """Base schema for a library book document."""
+    title: str = Field(..., description="Book title", min_length=1, max_length=500)
+    author: str = Field(..., description="Book author", min_length=1, max_length=300)
+    number_of_pages: int = Field(..., description="Number of pages in the book", gt=0)
+    rating: float = Field(..., description="Book rating", ge=0, le=5)
+    publication_year: int = Field(..., description="Year the book was published", ge=1000, le=9999)
+    summary: str = Field(..., description="Book summary", min_length=1)
+    genres: List[str] = Field(..., description="List of book genres")
+    metadata: dict = Field(..., description="Book metadata (isbn, language, edition)")
+    is_checked_out: bool = Field(..., description="Whether the book is currently checked out")
+    borrower: Optional[str] = Field(None, description="Name of the borrower if checked out")
+    due_date: Optional[str] = Field(None, description="Due date if checked out")
     vectorize_text: Optional[str] = Field(
         None,
         alias="$vectorize",
-        description="Review text used by AstraDB to generate embeddings",
+        description="Text used by AstraDB to generate embeddings (summary and genres)",
         min_length=1
     )
 
     model_config = ConfigDict(populate_by_name=True)
 
 
-class MovieReviewCreate(MovieReviewBase):
-    """Schema for creating a movie review document."""
+class LibraryBookCreate(LibraryBookBase):
+    """Schema for creating a library book document."""
     pass
 
 
-class MovieReviewUpdate(BaseModel):
-    """Schema for updating a movie review document. All fields are optional."""
-    title: Optional[str] = Field(None, description="Movie title", min_length=1, max_length=300)
-    reviewid: Optional[str] = Field(None, description="External review identifier", min_length=1, max_length=100)
-    creationdate: Optional[datetime] = Field(None, description="Review creation timestamp")
-    criticname: Optional[str] = Field(None, description="Name of the critic", max_length=200)
-    originalscore: Optional[str] = Field(None, description="Original score from the review source", max_length=100)
-    reviewstate: Optional[str] = Field(None, description="Review state", max_length=100)
+class LibraryBookUpdate(BaseModel):
+    """Schema for updating a library book document. All fields are optional."""
+    title: Optional[str] = Field(None, description="Book title", min_length=1, max_length=500)
+    author: Optional[str] = Field(None, description="Book author", min_length=1, max_length=300)
+    number_of_pages: Optional[int] = Field(None, description="Number of pages in the book", gt=0)
+    rating: Optional[float] = Field(None, description="Book rating", ge=0, le=5)
+    publication_year: Optional[int] = Field(None, description="Year the book was published", ge=1000, le=9999)
+    summary: Optional[str] = Field(None, description="Book summary", min_length=1)
+    genres: Optional[List[str]] = Field(None, description="List of book genres")
+    metadata: Optional[dict] = Field(None, description="Book metadata (isbn, language, edition)")
+    is_checked_out: Optional[bool] = Field(None, description="Whether the book is currently checked out")
+    borrower: Optional[str] = Field(None, description="Name of the borrower if checked out")
+    due_date: Optional[str] = Field(None, description="Due date if checked out")
     vectorize_text: Optional[str] = Field(
         None,
         alias="$vectorize",
-        description="Review text used by AstraDB to generate embeddings",
+        description="Text used by AstraDB to generate embeddings (summary and genres)",
         min_length=1
     )
 
     model_config = ConfigDict(populate_by_name=True)
 
 
-class MovieReviewResponse(MovieReviewBase):
-    """Schema for movie review response."""
-    id: str = Field(..., description="Unique identifier for the movie review")
+class LibraryBookResponse(LibraryBookBase):
+    """Schema for library book response."""
+    id: str = Field(..., description="Unique identifier for the library book")
     embedding: Optional[list[float]] = Field(None, description="Optional embedding payload if stored in the document")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, extra="ignore")
 
 
-class MovieReviewListResponse(BaseModel):
-    """Schema for list of movie review documents."""
-    movie_reviews: list[MovieReviewResponse] = Field(..., description="List of movie review documents")
-    total: int = Field(..., description="Total number of movie review documents")
+class LibraryBookListResponse(BaseModel):
+    """Schema for list of library book documents."""
+    library_books: List[LibraryBookResponse] = Field(..., description="List of library book documents")
+    total: int = Field(..., description="Total number of library book documents")
 
 
 class HealthResponse(BaseModel):

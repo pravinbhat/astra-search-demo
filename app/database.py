@@ -73,165 +73,174 @@ class AstraDBClient:
             raise RuntimeError("AstraDB collection is not initialized")
         return self.collection
 
-    def _normalize_movie_review_document(self, doc: Dict[str, Any]) -> Dict[str, Any]:
+    def _normalize_library_book_document(self, doc: Dict[str, Any]) -> Dict[str, Any]:
         """Map Astra document fields to API response fields."""
         normalized = dict(doc)
         normalized["id"] = str(normalized.pop("_id"))
+        
+        # Convert DataAPITimestamp to string if present
+        if "due_date" in normalized and normalized["due_date"] is not None:
+            # Check if it's a DataAPITimestamp object
+            if hasattr(normalized["due_date"], "to_string"):
+                normalized["due_date"] = normalized["due_date"].to_string()
+            elif hasattr(normalized["due_date"], "isoformat"):
+                normalized["due_date"] = normalized["due_date"].isoformat()
+        
         return normalized
 
-    async def create_movie_review(self, movie_review_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def create_library_book(self, library_book_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Create a new movie review document in the collection.
+        Create a new library book document in the collection.
         
         Args:
-            movie_review_data: Dictionary containing movie review data
+            library_book_data: Dictionary containing library book data
             
         Returns:
-            Created movie review document, or None if failed
+            Created library book document, or None if failed
         """
         try:
             collection = self._ensure_collection()
-            document = dict(movie_review_data)
+            document = dict(library_book_data)
             result = collection.insert_one(document)
 
             created = collection.find_one({"_id": result.inserted_id})
             if created:
-                return self._normalize_movie_review_document(created)
+                return self._normalize_library_book_document(created)
 
             document["_id"] = result.inserted_id
-            return self._normalize_movie_review_document(document)
+            return self._normalize_library_book_document(document)
             
         except DataAPIException as e:
-            logger.error(f"Failed to create movie review: {str(e)}")
+            logger.error(f"Failed to create library book: {str(e)}")
             return None
         except Exception as e:
-            logger.error(f"Unexpected error creating movie review: {str(e)}")
+            logger.error(f"Unexpected error creating library book: {str(e)}")
             return None
     
-    async def get_movie_review(self, movie_review_id: str) -> Optional[Dict[str, Any]]:
+    async def get_library_book(self, library_book_id: str) -> Optional[Dict[str, Any]]:
         """
-        Retrieve a movie review document by ID.
+        Retrieve a library book document by ID.
         
         Args:
-            movie_review_id: ID of the movie review to retrieve
+            library_book_id: ID of the library book to retrieve
             
         Returns:
-            Movie review data or None if not found
+            Library book data or None if not found
         """
         try:
             collection = self._ensure_collection()
-            result = collection.find_one({"_id": movie_review_id})
+            result = collection.find_one({"_id": library_book_id})
             
             if result:
-                return self._normalize_movie_review_document(result)
+                return self._normalize_library_book_document(result)
             return None
             
         except DataAPIException as e:
-            logger.error(f"Failed to get movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Failed to get library book {library_book_id}: {str(e)}")
             return None
         except Exception as e:
-            logger.error(f"Unexpected error getting movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Unexpected error getting library book {library_book_id}: {str(e)}")
             return None
     
-    async def list_movie_reviews(self, skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
+    async def list_library_books(self, skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
         """
-        List movie review documents with pagination.
+        List library book documents with pagination.
         
         Args:
-            skip: Number of movie review documents to skip
-            limit: Maximum number of movie review documents to return
+            skip: Number of library book documents to skip
+            limit: Maximum number of library book documents to return
             
         Returns:
-            List of movie review documents
+            List of library book documents
         """
         try:
             collection = self._ensure_collection()
             cursor = collection.find({}, limit=skip + limit)
-            movie_reviews = []
+            library_books = []
             
             for index, doc in enumerate(cursor):
                 if index < skip:
                     continue
-                movie_reviews.append(self._normalize_movie_review_document(doc))
-                if len(movie_reviews) >= limit:
+                library_books.append(self._normalize_library_book_document(doc))
+                if len(library_books) >= limit:
                     break
             
-            return movie_reviews
+            return library_books
             
         except DataAPIException as e:
-            logger.error(f"Failed to list movie reviews: {str(e)}")
+            logger.error(f"Failed to list library books: {str(e)}")
             return []
         except Exception as e:
-            logger.error(f"Unexpected error listing movie reviews: {str(e)}")
+            logger.error(f"Unexpected error listing library books: {str(e)}")
             return []
     
-    async def update_movie_review(self, movie_review_id: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def update_library_book(self, library_book_id: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Update a movie review document by ID.
+        Update a library book document by ID.
         
         Args:
-            movie_review_id: ID of the movie review to update
+            library_book_id: ID of the library book to update
             update_data: Dictionary containing fields to update
             
         Returns:
-            Updated movie review document or None if not found
+            Updated library book document or None if not found
         """
         try:
             collection = self._ensure_collection()
             result = collection.find_one_and_update(
-                {"_id": movie_review_id},
+                {"_id": library_book_id},
                 {"$set": update_data},
                 return_document="after"
             )
             
             if result:
-                return self._normalize_movie_review_document(result)
+                return self._normalize_library_book_document(result)
             return None
             
         except DataAPIException as e:
-            logger.error(f"Failed to update movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Failed to update library book {library_book_id}: {str(e)}")
             return None
         except Exception as e:
-            logger.error(f"Unexpected error updating movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Unexpected error updating library book {library_book_id}: {str(e)}")
             return None
     
-    async def delete_movie_review(self, movie_review_id: str) -> bool:
+    async def delete_library_book(self, library_book_id: str) -> bool:
         """
-        Delete a movie review document by ID.
+        Delete a library book document by ID.
         
         Args:
-            movie_review_id: ID of the movie review to delete
+            library_book_id: ID of the library book to delete
             
         Returns:
             True if deleted, False otherwise
         """
         try:
             collection = self._ensure_collection()
-            result = collection.delete_one({"_id": movie_review_id})
+            result = collection.delete_one({"_id": library_book_id})
             return result.deleted_count > 0
             
         except DataAPIException as e:
-            logger.error(f"Failed to delete movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Failed to delete library book {library_book_id}: {str(e)}")
             return False
         except Exception as e:
-            logger.error(f"Unexpected error deleting movie review {movie_review_id}: {str(e)}")
+            logger.error(f"Unexpected error deleting library book {library_book_id}: {str(e)}")
             return False
     
-    async def count_movie_reviews(self) -> int:
+    async def count_library_books(self) -> int:
         """
-        Count total number of movie review documents in the collection.
+        Count total number of library book documents in the collection.
         
         Returns:
-            Total count of movie review documents
+            Total count of library book documents
         """
         try:
             collection = self._ensure_collection()
             return collection.count_documents({}, upper_bound=1000000)
         except DataAPIException as e:
-            logger.error(f"Failed to count movie reviews: {str(e)}")
+            logger.error(f"Failed to count library books: {str(e)}")
             return 0
         except Exception as e:
-            logger.error(f"Unexpected error counting movie reviews: {str(e)}")
+            logger.error(f"Unexpected error counting library books: {str(e)}")
             return 0
 
 
