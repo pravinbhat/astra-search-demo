@@ -55,7 +55,11 @@ Update `.env` with your AstraDB values:
 ASTRA_DB_API_ENDPOINT=https://your-database-id-your-region.apps.astra.datastax.com
 ASTRA_DB_APPLICATION_TOKEN=AstraCS:your-token-here
 ASTRA_DB_KEYSPACE=default_keyspace
-COLLECTION_NAME=movie_reviews
+COLLECTION_NAME=library_books
+
+# Embedding Configuration (for vectorize feature)
+EMBEDDING_PROVIDER=nvidia
+EMBEDDING_MODEL_NAME=nvidia/nv-embedqa-e5-v5
 ```
 
 ## Getting AstraDB credentials
@@ -64,6 +68,43 @@ COLLECTION_NAME=movie_reviews
 2. Select your database
 3. Copy the API endpoint
 4. Create or use an application token
+
+## Data Ingestion
+
+The project includes scripts to create and hydrate the `library_books` collection with sample data.
+
+### 1. Create the collection
+
+Run the collection creation script to set up the `library_books` collection with vectorize enabled:
+
+```bash
+python scripts/db_create_collection.py
+```
+
+This script:
+- Creates a collection with COSINE vector metric
+- Configures AstraDB's vectorize feature with NVIDIA embeddings
+- Uses the embedding provider and model specified in your `.env` file
+
+### 2. Hydrate the collection
+
+Load the sample library books dataset into the collection:
+
+```bash
+python scripts/db_hydrate_collection.py
+```
+
+This script:
+- Reads book data from `data/quickstart_dataset.json`
+- Transforms the data and adds `$vectorize` fields (summary + genres)
+- Inserts documents into the collection
+- AstraDB automatically generates embeddings via the vectorize feature
+
+The sample dataset includes library books with:
+- Title, author, publication year
+- Summary, genres, ratings
+- Checkout status and borrower information
+- Metadata (ISBN, language, edition)
 
 ## Run the app
 
