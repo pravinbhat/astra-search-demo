@@ -7,7 +7,7 @@ pydantic==2.10.3
 pydantic-settings==2.6.1
 
 # AstraDB Data API client
-astrapy==1.5.2
+astrapy>=2.0,<3.0
 
 # Environment variables
 python-dotenv==1.0.1
