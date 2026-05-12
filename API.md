@@ -16,7 +16,10 @@ GET    /api/library-books
 GET    /api/library-books/{library_book_id}
 PUT    /api/library-books/{library_book_id}
 DELETE /api/library-books/{library_book_id}
+POST   /api/library-books/search
 ```
+
+> **Note:** For detailed documentation on the search endpoint including filter operators, examples, and advanced usage, see [SEARCH_API.md](SEARCH_API.md).
 
 ## Entity shape
 

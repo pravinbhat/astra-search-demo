@@ -242,6 +242,64 @@ class AstraDBClient:
         except Exception as e:
             logger.error(f"Unexpected error counting library books: {str(e)}")
             return 0
+    
+    async def search_library_books(
+        self,
+        filter_predicates: Dict[str, Any],
+        skip: int = 0,
+        limit: int = 100
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """
+        Search library book documents using filter predicates.
+        
+        Args:
+            filter_predicates: Dictionary containing filter predicates for the search
+                              (e.g., {'author': 'John Anthony', 'rating': {'$gte': 4.0}})
+            skip: Number of documents to skip
+            limit: Maximum number of documents to return
+            
+        Returns:
+            Tuple of (list of matching library book documents, total count of matches)
+            
+        Examples:
+            # Simple equality filter
+            await search_library_books({'author': 'John Anthony'})
+            
+            # Range filter
+            await search_library_books({'rating': {'$gte': 4.0}})
+            
+            # Multiple conditions
+            await search_library_books({'author': 'John Anthony', 'is_checked_out': False})
+            
+            # Array contains filter
+            await search_library_books({'genres': {'$in': ['Science Fiction', 'Fantasy']}})
+        """
+        try:
+            collection = self._ensure_collection()
+            
+            # Count total matching documents
+            total = collection.count_documents(filter_predicates, upper_bound=1000000)
+            
+            # Find documents with pagination
+            cursor = collection.find(filter_predicates, limit=skip + limit)
+            library_books = []
+            
+            for index, doc in enumerate(cursor):
+                if index < skip:
+                    continue
+                library_books.append(self._normalize_library_book_document(doc))
+                if len(library_books) >= limit:
+                    break
+            
+            logger.info(f"Search completed: found {total} documents, returning {len(library_books)}")
+            return library_books, total
+            
+        except DataAPIException as e:
+            logger.error(f"Failed to search library books: {str(e)}")
+            return [], 0
+        except Exception as e:
+            logger.error(f"Unexpected error searching library books: {str(e)}")
+            return [], 0
 
 
 # Global database client instance

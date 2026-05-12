@@ -3,7 +3,7 @@ Pydantic models for request/response validation.
 """
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -78,6 +78,38 @@ class HealthResponse(BaseModel):
     app_name: str = Field(..., description="Application name")
     version: str = Field(..., description="Application version")
     astra_db_connected: bool = Field(..., description="AstraDB connection status")
+
+
+class SearchFilter(BaseModel):
+    """Schema for search filter predicates."""
+    filter: Dict[str, Any] = Field(
+        ...,
+        description="Filter predicates for searching documents (e.g., {'author': 'John Anthony', 'rating': {'$gte': 4.0}})"
+    )
+    skip: int = Field(0, ge=0, description="Number of documents to skip")
+    limit: int = Field(100, ge=1, le=1000, description="Maximum number of documents to return")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "filter": {"author": "John Anthony"},
+                    "skip": 0,
+                    "limit": 10
+                },
+                {
+                    "filter": {"rating": {"$gte": 4.0}, "is_checked_out": False},
+                    "skip": 0,
+                    "limit": 20
+                },
+                {
+                    "filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}},
+                    "skip": 0,
+                    "limit": 50
+                }
+            ]
+        }
+    )
 
 
 class ErrorResponse(BaseModel):

@@ -9,6 +9,7 @@ from app.models import (
     LibraryBookUpdate,
     LibraryBookResponse,
     LibraryBookListResponse,
+    SearchFilter,
     ErrorResponse
 )
 from app.database import db_client
@@ -80,6 +81,67 @@ async def list_library_books(
         library_books=[LibraryBookResponse(**library_book) for library_book in library_books],
         total=total
     )
+
+
+@router.post(
+    "/search",
+    response_model=LibraryBookListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Search Library Books",
+    description="Search library book documents using filter predicates",
+    responses={
+        200: {"description": "Search completed successfully"},
+        500: {"model": ErrorResponse, "description": "Internal server error"}
+    }
+)
+async def search_library_books(search_filter: SearchFilter) -> LibraryBookListResponse:
+    """
+    Search library book documents using filter predicates.
+    
+    Supports various filter operations:
+    - Equality: {"author": "John Anthony"}
+    - Comparison: {"rating": {"$gte": 4.0}, "number_of_pages": {"$lt": 500}}
+    - Array operations: {"genres": {"$in": ["Science Fiction", "Fantasy"]}}
+    - Multiple conditions: {"author": "John Anthony", "is_checked_out": false}
+    
+    Args:
+        search_filter: Search filter containing predicates, skip, and limit
+        
+    Returns:
+        List of matching library book documents with total count
+        
+    Raises:
+        HTTPException: If search fails
+        
+    Examples:
+        # Search by author
+        {"filter": {"author": "John Anthony"}, "skip": 0, "limit": 10}
+        
+        # Search by rating range
+        {"filter": {"rating": {"$gte": 4.0}}, "skip": 0, "limit": 20}
+        
+        # Search by multiple criteria
+        {"filter": {"author": "John Anthony", "is_checked_out": false}, "skip": 0, "limit": 10}
+        
+        # Search by genre
+        {"filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}}, "skip": 0, "limit": 50}
+    """
+    try:
+        library_books, total = await db_client.search_library_books(
+            filter_predicates=search_filter.filter,
+            skip=search_filter.skip,
+            limit=search_filter.limit
+        )
+        
+        return LibraryBookListResponse(
+            library_books=[LibraryBookResponse(**library_book) for library_book in library_books],
+            total=total
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(e)}"
+        )
 
 
 @router.get(
