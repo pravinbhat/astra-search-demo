@@ -61,6 +61,11 @@ class LibraryBookUpdate(BaseModel):
 class LibraryBookResponse(LibraryBookBase):
     """Schema for library book response."""
     id: str = Field(..., description="Unique identifier for the library book")
+    similarity: Optional[float] = Field(
+        None,
+        alias="$similarity",
+        description="Similarity score returned by AstraDB for semantic search results"
+    )
     embedding: Optional[list[float]] = Field(None, description="Optional embedding payload if stored in the document")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, extra="ignore")
@@ -80,11 +85,16 @@ class HealthResponse(BaseModel):
     astra_db_connected: bool = Field(..., description="AstraDB connection status")
 
 
-class SearchFilter(BaseModel):
-    """Schema for search filter predicates."""
+class LibraryBookSearchRequest(BaseModel):
+    """Schema for filter, semantic, and semantic filter search requests."""
     filter: Dict[str, Any] = Field(
-        ...,
+        default_factory=dict,
         description="Filter predicates for searching documents (e.g., {'author': 'John Anthony', 'rating': {'$gte': 4.0}})"
+    )
+    query: Optional[str] = Field(
+        None,
+        description="Semantic search query used for AstraDB vector search",
+        min_length=1
     )
     skip: int = Field(0, ge=0, description="Number of documents to skip")
     limit: int = Field(100, ge=1, le=1000, description="Maximum number of documents to return")
@@ -98,14 +108,15 @@ class SearchFilter(BaseModel):
                     "limit": 10
                 },
                 {
-                    "filter": {"rating": {"$gte": 4.0}, "is_checked_out": False},
+                    "query": "books about resilience and survival",
                     "skip": 0,
-                    "limit": 20
+                    "limit": 10
                 },
                 {
                     "filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}},
+                    "query": "books about space exploration and adventure",
                     "skip": 0,
-                    "limit": 50
+                    "limit": 20
                 }
             ]
         }

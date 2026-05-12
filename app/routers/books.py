@@ -9,7 +9,7 @@ from app.models import (
     LibraryBookUpdate,
     LibraryBookResponse,
     LibraryBookListResponse,
-    SearchFilter,
+    LibraryBookSearchRequest,
     ErrorResponse
 )
 from app.database import db_client
@@ -88,24 +88,23 @@ async def list_library_books(
     response_model=LibraryBookListResponse,
     status_code=status.HTTP_200_OK,
     summary="Search Library Books",
-    description="Search library book documents using filter predicates",
+    description="Search library book documents using filters, semantic queries, or both",
     responses={
         200: {"description": "Search completed successfully"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     }
 )
-async def search_library_books(search_filter: SearchFilter) -> LibraryBookListResponse:
+async def search_library_books(search_filter: LibraryBookSearchRequest) -> LibraryBookListResponse:
     """
-    Search library book documents using filter predicates.
+    Search library book documents using filters, semantic queries, or both.
     
-    Supports various filter operations:
-    - Equality: {"author": "John Anthony"}
-    - Comparison: {"rating": {"$gte": 4.0}, "number_of_pages": {"$lt": 500}}
-    - Array operations: {"genres": {"$in": ["Science Fiction", "Fantasy"]}}
-    - Multiple conditions: {"author": "John Anthony", "is_checked_out": false}
+    Supported search modes:
+    - Filter search: {"filter": {"author": "John Anthony"}}
+    - Semantic search: {"query": "books about resilience and survival"}
+    - Semantic filter search: {"filter": {"genres": {"$in": ["Science Fiction"]}}, "query": "books about space exploration"}
     
     Args:
-        search_filter: Search filter containing predicates, skip, and limit
+        search_filter: Search request containing filter predicates, optional semantic query, skip, and limit
         
     Returns:
         List of matching library book documents with total count
@@ -114,24 +113,30 @@ async def search_library_books(search_filter: SearchFilter) -> LibraryBookListRe
         HTTPException: If search fails
         
     Examples:
-        # Search by author
+        # Filter search by author
         {"filter": {"author": "John Anthony"}, "skip": 0, "limit": 10}
         
-        # Search by rating range
-        {"filter": {"rating": {"$gte": 4.0}}, "skip": 0, "limit": 20}
+        # Semantic search by query
+        {"query": "books about resilience and survival", "skip": 0, "limit": 10}
         
-        # Search by multiple criteria
-        {"filter": {"author": "John Anthony", "is_checked_out": false}, "skip": 0, "limit": 10}
-        
-        # Search by genre
-        {"filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}}, "skip": 0, "limit": 50}
+        # Semantic filter search
+        {"filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}}, "query": "books about space exploration", "skip": 0, "limit": 20}
     """
     try:
-        library_books, total = await db_client.search_library_books(
-            filter_predicates=search_filter.filter,
-            skip=search_filter.skip,
-            limit=search_filter.limit
-        )
+        query = search_filter.query.strip() if search_filter.query else None
+        if query:
+            library_books, total = await db_client.semantic_search_library_books(
+                query=query,
+                filter_predicates=search_filter.filter,
+                skip=search_filter.skip,
+                limit=search_filter.limit
+            )
+        else:
+            library_books, total = await db_client.search_library_books(
+                filter_predicates=search_filter.filter,
+                skip=search_filter.skip,
+                limit=search_filter.limit
+            )
         
         return LibraryBookListResponse(
             library_books=[LibraryBookResponse(**library_book) for library_book in library_books],

@@ -196,4 +196,59 @@ class TestLibraryBooksEndpoint:
         response = client.get("/api/library-books/nonexistent-id")
         assert response.status_code == 404
 
+    def test_search_library_books_with_filter(self):
+        """Test filter search returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "filter": {"author": "John Anthony"},
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+    def test_search_library_books_with_query(self):
+        """Test semantic search request is accepted and returns similarity metadata when available."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "query": "books about resilience and survival",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+        for book in data["library_books"]:
+            assert "$similarity" in book or book.get("$similarity") is None
+
+    def test_search_library_books_with_filter_and_query(self):
+        """Test semantic filter search request is accepted and returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "filter": {"genres": {"$in": ["Science Fiction"]}},
+                "query": "books about futuristic worlds",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
 # Made with Bob

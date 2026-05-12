@@ -19,7 +19,7 @@ DELETE /api/library-books/{library_book_id}
 POST   /api/library-books/search
 ```
 
-> **Note:** For detailed documentation on the search endpoint including filter operators, examples, and advanced usage, see [SEARCH_API.md](SEARCH_API.md).
+> **Note:** For detailed documentation on the search endpoint including filter search, semantic search, semantic filter search, operators, and examples, see [SEARCH_API.md](SEARCH_API.md).
 
 ## Entity shape
 
@@ -139,6 +139,7 @@ Example single book response:
   "borrower": null,
   "due_date": null,
   "$vectorize": null,
+  "$similarity": 0.91,
   "embedding": null
 }
 ```
@@ -166,6 +167,7 @@ Example list response:
       "borrower": null,
       "due_date": null,
       "$vectorize": null,
+      "$similarity": 0.91,
       "embedding": null
     }
   ],
@@ -187,4 +189,5 @@ Example list response:
 - `borrower`: Name of the person who borrowed the book (optional, null if not checked out)
 - `due_date`: Due date for return if checked out (optional, ISO 8601 format string)
 - `$vectorize`: Text used for embedding generation (optional, typically summary + genres)
+- `$similarity`: Similarity score returned by AstraDB for semantic search results (optional)
 - `embedding`: Vector embedding (read-only, managed by AstraDB)

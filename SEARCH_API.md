@@ -2,7 +2,7 @@
 
 ## Overview
 
-The search endpoint allows you to query library books using flexible filter predicates powered by AstraDB's Data API via the astrapy package.
+The search endpoint allows you to query library books using filter predicates, semantic queries, or both, powered by AstraDB's Data API via the astrapy package.
 
 ## Endpoint
 
@@ -13,8 +13,9 @@ The search endpoint allows you to query library books using flexible filter pred
 ```json
 {
   "filter": {
-    // Filter predicates (see examples below)
+    // Optional filter predicates (see examples below)
   },
+  "query": "Optional semantic search query",
   "skip": 0,
   "limit": 100
 }
@@ -22,9 +23,21 @@ The search endpoint allows you to query library books using flexible filter pred
 
 ### Parameters
 
-- **filter** (required): Dictionary containing filter predicates for searching documents
+- **filter** (optional): Dictionary containing filter predicates for searching documents
+- **query** (optional): Semantic search query/prompt used for AstraDB vector search
 - **skip** (optional): Number of documents to skip for pagination (default: 0, min: 0)
 - **limit** (optional): Maximum number of documents to return (default: 100, min: 1, max: 1000)
+
+## Search Modes
+
+### 1. Filter Search
+Use only the `filter` field to perform predicate-based search.
+
+### 2. Semantic Search
+Use only the `query` field to perform semantic vector search.
+
+### 3. Semantic Filter Search
+Use both `filter` and `query` to constrain semantic search results using metadata predicates.
 
 ## Filter Operators
 
@@ -102,7 +115,8 @@ Combine multiple filter conditions (implicit AND).
       },
       "is_checked_out": false,
       "borrower": null,
-      "due_date": null
+      "due_date": null,
+      "$similarity": 0.91
     }
   ],
   "total": 1
@@ -111,7 +125,7 @@ Combine multiple filter conditions (implicit AND).
 
 ## Example Requests
 
-### 1. Search by Author
+### 1. Filter Search by Author
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
@@ -123,19 +137,19 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
   }'
 ```
 
-### 2. Search by Rating Range
+### 2. Semantic Search by Query
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
   -H "Content-Type: application/json" \
   -d '{
-    "filter": {"rating": {"$gte": 4.0}},
+    "query": "books about resilience and survival",
     "skip": 0,
-    "limit": 20
+    "limit": 10
   }'
 ```
 
-### 3. Search Available Books by Genre
+### 3. Semantic Filter Search by Genre
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
@@ -145,12 +159,13 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
       "genres": {"$in": ["Science Fiction", "Fantasy"]},
       "is_checked_out": false
     },
+    "query": "books about space exploration and adventure",
     "skip": 0,
     "limit": 50
   }'
 ```
 
-### 4. Search by Publication Year Range
+### 4. Filter Search by Publication Year Range
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
@@ -164,7 +179,7 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
   }'
 ```
 
-### 5. Complex Multi-Criteria Search
+### 5. Semantic Filter Search with Multiple Criteria
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
@@ -176,6 +191,7 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
       "number_of_pages": {"$lt": 500},
       "is_checked_out": false
     },
+    "query": "books about ambition and social class",
     "skip": 0,
     "limit": 25
   }'
@@ -186,7 +202,7 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
 ```python
 import requests
 
-# Search for available science fiction books with high ratings
+# Semantic filter search for available science fiction books
 response = requests.post(
     "http://localhost:8000/api/library-books/search",
     json={
@@ -195,6 +211,7 @@ response = requests.post(
             "rating": {"$gte": 4.0},
             "is_checked_out": False
         },
+        "query": "books about futuristic worlds and survival",
         "skip": 0,
         "limit": 10
     }
@@ -203,7 +220,10 @@ response = requests.post(
 data = response.json()
 print(f"Found {data['total']} books")
 for book in data['library_books']:
-    print(f"- {book['title']} by {book['author']} (Rating: {book['rating']})")
+    print(
+        f"- {book['title']} by {book['author']} "
+        f"(Rating: {book['rating']}, Similarity: {book.get('$similarity')})"
+    )
 ```
 
 ## Error Responses
@@ -217,11 +237,13 @@ for book in data['library_books']:
 
 ## Notes
 
-- The search uses AstraDB's native filter capabilities via the astrapy package
+- The search uses AstraDB's native filter capabilities and vector search support via the astrapy package
 - All filter operations are performed server-side for optimal performance
+- Semantic search uses the collection's `$vectorize` configuration
 - Pagination is supported through `skip` and `limit` parameters
-- The `total` field in the response indicates the total number of matching documents (not just the returned page)
-- Empty filter `{}` will return all documents (subject to pagination limits)
+- The `total` field in the response indicates the number of results iterated for the current search mode
+- Empty filter `{}` with no query will return all documents (subject to pagination limits)
+- Semantic results may include AstraDB's `$similarity` field
 
 ## Implementation Details
 
@@ -231,7 +253,8 @@ The search endpoint is implemented using:
 - **Pydantic** for request/response validation
 
 The search flow:
-1. Request validation using `SearchFilter` Pydantic model
-2. Filter predicates passed to `db_client.search_library_books()`
-3. AstraDB collection's `find()` method executes the query
-4. Results are normalized and returned with total count
+1. Request validation using `LibraryBookSearchRequest` Pydantic model
+2. Filter-only requests call `db_client.search_library_books()`
+3. Requests with `query` call `db_client.semantic_search_library_books()`
+4. AstraDB collection's `find()` method executes the query with optional vector sorting
+5. Results are normalized and returned with total count

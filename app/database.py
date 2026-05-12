@@ -301,6 +301,59 @@ class AstraDBClient:
             logger.error(f"Unexpected error searching library books: {str(e)}")
             return [], 0
 
+    async def semantic_search_library_books(
+        self,
+        query: str,
+        filter_predicates: Optional[Dict[str, Any]] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """
+        Search library book documents semantically using AstraDB vectorize support.
+        
+        Args:
+            query: Semantic search query text
+            filter_predicates: Optional filter predicates to apply with semantic search
+            skip: Number of documents to skip
+            limit: Maximum number of documents to return
+            
+        Returns:
+            Tuple of (list of matching library book documents, total count of matches)
+        """
+        try:
+            collection = self._ensure_collection()
+            filter_predicates = filter_predicates or {}
+
+            cursor = collection.find(
+                filter_predicates,
+                sort={"$vectorize": query},
+                include_similarity=True,
+                limit=skip + limit,
+            )
+
+            library_books = []
+            total = 0
+
+            for index, doc in enumerate(cursor):
+                total += 1
+                if index < skip:
+                    continue
+                library_books.append(self._normalize_library_book_document(doc))
+                if len(library_books) >= limit:
+                    break
+
+            logger.info(
+                f"Semantic search completed: returning {len(library_books)} documents for query '{query}'"
+            )
+            return library_books, total
+
+        except DataAPIException as e:
+            logger.error(f"Failed to perform semantic search for query '{query}': {str(e)}")
+            return [], 0
+        except Exception as e:
+            logger.error(f"Unexpected error performing semantic search for query '{query}': {str(e)}")
+            return [], 0
+
 
 # Global database client instance
 db_client = AstraDBClient()
