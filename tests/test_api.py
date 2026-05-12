@@ -40,103 +40,160 @@ class TestRootEndpoint:
         assert "health" in data
 
 
-class TestMovieReviewsEndpoint:
-    """Tests for movie_review CRUD endpoints."""
+class TestLibraryBooksEndpoint:
+    """Tests for library_book CRUD endpoints."""
     
-    def test_list_movie_reviews_empty(self):
-        """Test listing movie_review documents returns the expected shape."""
-        response = client.get("/api/movie-reviews")
+    def test_list_library_books_empty(self):
+        """Test listing library_book documents returns the expected shape (limited to top 5)."""
+        response = client.get("/api/library-books?limit=5")
         assert response.status_code == 200
         
         data = response.json()
-        assert "movie_reviews" in data
+
+        assert "library_books" in data
         assert "total" in data
-        assert isinstance(data["movie_reviews"], list)
+        assert isinstance(data["library_books"], list)
+        assert len(data["library_books"]) <= 5, "Should return at most 5 books"
     
-    @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_create_movie_review(self):
-        """Test creating a new movie_review document."""
-        movie_review_data = {
-            "title": "Test Movie",
-            "reviewid": "review-123",
-            "creationdate": "2024-01-01T12:00:00Z",
-            "criticname": "Test Critic",
-            "originalscore": "4/5",
-            "reviewstate": "published",
-            "$vectorize": "A thoughtful and well-acted film."
+    @pytest.mark.asyncio
+    async def test_create_library_book(self, cleanup_test_books):
+        """Test creating a new library_book document."""
+        library_book_data = {
+            "title": "Test Book",
+            "author": "Test Author",
+            "number_of_pages": 300,
+            "rating": 4.5,
+            "publication_year": 2024,
+            "summary": "A test book for unit testing.",
+            "genres": ["Fiction", "Test"],
+            "metadata": {
+                "isbn": "978-0-123456-78-9",
+                "language": "English",
+                "edition": "First Edition"
+            },
+            "is_checked_out": False,
+            "borrower": None,
+            "due_date": None,
+            "$vectorize": "summary: A test book for unit testing. | genres: Fiction, Test"
         }
         
-        response = client.post("/api/movie-reviews", json=movie_review_data)
+        response = client.post("/api/library-books", json=library_book_data)
         assert response.status_code == 201
         
         data = response.json()
-        assert data["title"] == movie_review_data["title"]
-        assert data["reviewid"] == movie_review_data["reviewid"]
-        assert data["criticname"] == movie_review_data["criticname"]
-        assert data["$vectorize"] == movie_review_data["$vectorize"]
+        assert data["title"] == library_book_data["title"]
+        assert data["author"] == library_book_data["author"]
+        assert data["number_of_pages"] == library_book_data["number_of_pages"]
+        assert data["rating"] == library_book_data["rating"]
         assert "id" in data
-    
-    @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_get_movie_review(self):
-        """Test retrieving a specific movie_review document."""
-        movie_review_data = {
-            "title": "Test Movie",
-            "reviewid": "review-123",
-            "$vectorize": "This is a test review."
-        }
-        create_response = client.post("/api/movie-reviews", json=movie_review_data)
-        movie_review_id = create_response.json()["id"]
         
-        response = client.get(f"/api/movie-reviews/{movie_review_id}")
+        # Track for cleanup
+        cleanup_test_books.append(data["id"])
+    
+    @pytest.mark.asyncio
+    async def test_get_library_book(self, cleanup_test_books):
+        """Test retrieving a specific library_book document."""
+        library_book_data = {
+            "title": "Test Book",
+            "author": "Test Author",
+            "number_of_pages": 300,
+            "rating": 4.5,
+            "publication_year": 2024,
+            "summary": "A test book.",
+            "genres": ["Fiction"],
+            "metadata": {
+                "isbn": "978-0-123456-78-9",
+                "language": "English",
+                "edition": "First Edition"
+            },
+            "is_checked_out": False,
+            "borrower": None,
+            "due_date": None,
+            "$vectorize": "summary: A test book. | genres: Fiction"
+        }
+        create_response = client.post("/api/library-books", json=library_book_data)
+        library_book_id = create_response.json()["id"]
+        cleanup_test_books.append(library_book_id)
+        
+        response = client.get(f"/api/library-books/{library_book_id}")
         assert response.status_code == 200
         
         data = response.json()
-        assert data["id"] == movie_review_id
-        assert data["title"] == movie_review_data["title"]
-        assert data["reviewid"] == movie_review_data["reviewid"]
+        assert data["id"] == library_book_id
+        assert data["title"] == library_book_data["title"]
+        assert data["author"] == library_book_data["author"]
     
-    @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_update_movie_review(self):
-        """Test updating a movie_review document."""
-        movie_review_data = {
-            "title": "Test Movie",
-            "reviewid": "review-123",
-            "$vectorize": "Original review text."
+    @pytest.mark.asyncio
+    async def test_update_library_book(self, cleanup_test_books):
+        """Test updating a library_book document."""
+        library_book_data = {
+            "title": "Test Book",
+            "author": "Test Author",
+            "number_of_pages": 300,
+            "rating": 4.5,
+            "publication_year": 2024,
+            "summary": "Original summary.",
+            "genres": ["Fiction"],
+            "metadata": {
+                "isbn": "978-0-123456-78-9",
+                "language": "English",
+                "edition": "First Edition"
+            },
+            "is_checked_out": False,
+            "borrower": None,
+            "due_date": None,
+            "$vectorize": "summary: Original summary. | genres: Fiction"
         }
-        create_response = client.post("/api/movie-reviews", json=movie_review_data)
-        movie_review_id = create_response.json()["id"]
+        create_response = client.post("/api/library-books", json=library_book_data)
+        library_book_id = create_response.json()["id"]
+        cleanup_test_books.append(library_book_id)
         
         update_data = {
-            "reviewstate": "approved",
-            "$vectorize": "Updated review text."
+            "is_checked_out": True,
+            "borrower": "John Doe",
+            "due_date": "2024-12-31T23:59:59Z"
         }
-        response = client.put(f"/api/movie-reviews/{movie_review_id}", json=update_data)
+        response = client.put(f"/api/library-books/{library_book_id}", json=update_data)
         assert response.status_code == 200
         
         data = response.json()
-        assert data["reviewstate"] == update_data["reviewstate"]
-        assert data["$vectorize"] == update_data["$vectorize"]
+        assert data["is_checked_out"] == update_data["is_checked_out"]
+        assert data["borrower"] == update_data["borrower"]
     
-    @pytest.mark.skip(reason="Requires AstraDB connection")
-    def test_delete_movie_review(self):
-        """Test deleting a movie_review document."""
-        movie_review_data = {
-            "title": "Test Movie",
-            "reviewid": "review-123",
-            "$vectorize": "To be deleted."
+    @pytest.mark.asyncio
+    async def test_delete_library_book(self, cleanup_test_books):
+        """Test deleting a library_book document."""
+        library_book_data = {
+            "title": "Test Book",
+            "author": "Test Author",
+            "number_of_pages": 300,
+            "rating": 4.5,
+            "publication_year": 2024,
+            "summary": "To be deleted.",
+            "genres": ["Fiction"],
+            "metadata": {
+                "isbn": "978-0-123456-78-9",
+                "language": "English",
+                "edition": "First Edition"
+            },
+            "is_checked_out": False,
+            "borrower": None,
+            "due_date": None,
+            "$vectorize": "summary: To be deleted. | genres: Fiction"
         }
-        create_response = client.post("/api/movie-reviews", json=movie_review_data)
-        movie_review_id = create_response.json()["id"]
+        create_response = client.post("/api/library-books", json=library_book_data)
+        library_book_id = create_response.json()["id"]
+        # Note: No need to track for cleanup since we're testing deletion
         
-        response = client.delete(f"/api/movie-reviews/{movie_review_id}")
+        response = client.delete(f"/api/library-books/{library_book_id}")
         assert response.status_code == 204
         
-        get_response = client.get(f"/api/movie-reviews/{movie_review_id}")
+        get_response = client.get(f"/api/library-books/{library_book_id}")
         assert get_response.status_code == 404
     
-    def test_get_nonexistent_movie_review(self):
-        """Test retrieving a non-existent movie_review document returns 404."""
-        response = client.get("/api/movie-reviews/nonexistent-id")
+    def test_get_nonexistent_library_book(self):
+        """Test retrieving a non-existent library_book document returns 404."""
+        response = client.get("/api/library-books/nonexistent-id")
         assert response.status_code == 404
 
 # Made with Bob

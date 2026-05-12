@@ -88,7 +88,7 @@ This demo sets up the collection and API shape needed for those next steps.
 
 ## Documentation
 
-- [SETUP.md](SETUP.md) — installation, configuration, and local run instructions
+- [SETUP.md](SETUP.md) — installation, configuration, testing, and local run instructions
 - [API.md](API.md) — endpoint contract, payloads, and response examples
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — common issues and fixes
 

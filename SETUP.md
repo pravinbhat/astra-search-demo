@@ -115,4 +115,58 @@ uvicorn app.main:app --reload
 Once running:
 
 - API base URL: `http://localhost:8000`
+
+## Testing
+
+The project includes comprehensive API tests using pytest.
+
+### Running Tests
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Run tests with verbose output:
+
+```bash
+pytest -v
+```
+
+Run specific test classes:
+
+```bash
+pytest tests/test_api.py::TestHealthEndpoint
+pytest tests/test_api.py::TestLibraryBooksEndpoint
+```
+
+Run a specific test:
+
+```bash
+pytest tests/test_api.py::TestHealthEndpoint::test_health_check
+```
+
+### Test Coverage
+
+The test suite includes:
+
+- **Health Check Tests** - Verify API health endpoint and database connectivity
+- **Root Endpoint Tests** - Validate welcome message and API metadata
+- **CRUD Operations Tests** - Test create, read, update, and delete operations for library books
+- **Error Handling Tests** - Verify 404 responses for non-existent resources
+
+### Test Configuration
+
+Test configuration is managed in `pytest.ini`:
+- Async test support enabled
+- Verbose output by default
+- Short traceback format for readability
+
+### Test Fixtures
+
+The test suite uses fixtures defined in `tests/conftest.py` for:
+- Automatic cleanup of test data
+- Isolated test execution
+- Database state management
 - Swagger docs: `http://localhost:8000/docs`
