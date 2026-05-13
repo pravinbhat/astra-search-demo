@@ -1,12 +1,10 @@
 # Astra Search Demo
 
-A lightweight demo app for working with AstraDB and a `library_books` collection prepared for vector and hybrid search use cases.
+A demo app for AI-powered search workloads using [AstraDB's](https://astra.datastax.com/) multi-modal retrieval capabilities.
 
-This project is centered around library book documents stored in AstraDB, where:
+Built on AstraDB’s native [Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html) and [Apache Cassandra®](https://cassandra.apache.org/) foundation, this project implements a library book search application to showcase advanced retrieval topologies: semantic, lexical, metadata-filtered, and hybrid search.
 
-- `$vectorize` contains the book summary and genre information used for embedding generation
-- AstraDB's vectorize feature automatically generates and stores embeddings in the SaaS DB layer
-- the collection can be used for semantic or hybrid retrieval workflows
+The application interacts with a `library_books` collection leveraging AstraDB's native `$vectorize` feature. It [automatically generates and stores embeddings](https://docs.datastax.com/en/astra-db-serverless/databases/embedding-generation.html) (using book summaries and genre metadata) within the SaaS database layer, while utilizing native server-side reranking and hybrid workflows to maximize search accuracy.
 
 ## Quick Start
 
@@ -29,15 +27,13 @@ See [SETUP.md](SETUP.md) for detailed instructions.
 
 This project focuses on **search and retrieval** workflows.
 
-It includes data ingestion scripts to hydrate the collection with a sample library books dataset. However, it does **not** implement AI features like document processing, chunking, or custom embedding pipelines. Instead, it leverages AstraDB's built-in `vectorize` feature to auto-generate embeddings directly in the database layer.
+It includes data ingestion scripts to hydrate the collection with a sample [library books dataset](data/quickstart_dataset.json). However, it does **not** implement AI features like document processing, chunking, or custom embedding pipelines. Instead, it leverages AstraDB's built-in `vectorize` feature to auto-generate embeddings directly in the database layer.
 
 Use this project to:
 
 - set up and hydrate an AstraDB collection with library book data
-- connect a local app to the AstraDB collection
-- work with library book documents through a simple API
+- search library books
 - explore retrieval-oriented workflows for vector and hybrid search
-- validate the data access layer before adding dedicated search retrieval endpoints
 
 ## Data Ingestion
 
@@ -87,12 +83,14 @@ Notes:
 - the dataset is included in `data/quickstart_dataset.json` for easy hydration
 - embeddings are generated automatically in the SaaS DB layer using NVIDIA's embedding model
 
-## Why this matters for hybrid search
+## Why this matters
 
-AstraDB hybrid search combines:
+AstraDB search supports:
 
-- semantic similarity from vectors
+- metadata based search filters
+- semantic similarity search from vectors
 - keyword / lexical matching from text search
+- hybrid search using any combination of the above 
 
 That makes a library books dataset like this useful for questions such as:
 
@@ -100,8 +98,6 @@ That makes a library books dataset like this useful for questions such as:
 - "find dystopian books with high ratings"
 - "find books by specific authors with certain themes"
 - "find books semantically similar to a user query, while also matching specific genre or rating filters"
-
-This demo sets up the collection and API shape needed for those next steps.
 
 ## Documentation
 
@@ -139,4 +135,4 @@ This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
 
 ---
 
-Built with [IBM Bob](https://bob.ibm.com/) as my pair-programming partner.
+Built with [IBM Bob](https://bob.ibm.com/), my AI-Powered Development Partner.
