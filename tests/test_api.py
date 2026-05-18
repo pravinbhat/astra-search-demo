@@ -29,8 +29,17 @@ class TestRootEndpoint:
     """Tests for root endpoint."""
     
     def test_root(self):
-        """Test root endpoint returns welcome message."""
+        """Test root endpoint serves the UI."""
         response = client.get("/")
+        assert response.status_code == 200
+        
+        # Check that it returns HTML content
+        assert response.headers["content-type"] == "text/html; charset=utf-8"
+        assert b"<!DOCTYPE html>" in response.content or b"<html" in response.content
+    
+    def test_api_info(self):
+        """Test API info endpoint returns welcome message."""
+        response = client.get("/api")
         assert response.status_code == 200
         
         data = response.json()

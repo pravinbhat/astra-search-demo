@@ -75,8 +75,23 @@ if static_dir.exists():
     logger.info(f"Mounted static files from {static_dir}")
 
 
-@app.get("/", tags=["Root"])
+@app.get("/", tags=["UI"])
 async def root():
+    """
+    Serve the UI.
+    """
+    index_file = static_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    
+    return {
+        "error": "UI not found",
+        "message": "Please check app/static/index.html"
+    }
+
+
+@app.get("/api", tags=["Root"])
+async def api_info():
     """
     Return API information.
     """
@@ -85,21 +100,6 @@ async def root():
         "version": settings.app_version,
         "docs": "/docs",
         "health": "/health"
-    }
-
-
-@app.get("/ui", tags=["Frontend"])
-async def serve_ui():
-    """
-    Serve the frontend UI.
-    """
-    index_file = static_dir / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
-    
-    return {
-        "error": "Frontend UI not found",
-        "message": "Please check app/static/index.html"
     }
 
 
