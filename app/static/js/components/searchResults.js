@@ -41,10 +41,13 @@ function renderSimilarity(similarity) {
     return `<span class="book-similarity">Similarity: ${(similarity * 100).toFixed(0)}%</span>`;
 }
 
-export function createBookCard(book) {
+export function createBookCard(book, onClickHandler) {
     const card = document.createElement('div');
     card.className = 'book-card';
     card.dataset.bookId = book._id;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `View details for ${book.title} by ${book.author}`);
     const similarity = book.$similarity;
     
     card.innerHTML = `
@@ -69,10 +72,21 @@ export function createBookCard(book) {
         </div>
     `;
     
+    // Add click handler
+    if (onClickHandler) {
+        card.addEventListener('click', () => onClickHandler(book));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClickHandler(book);
+            }
+        });
+    }
+    
     return card;
 }
 
-export function renderResults(container, books, total, responseTime) {
+export function renderResults(container, books, total, responseTime, onBookClick) {
     container.innerHTML = '';
     
     if (!books || books.length === 0) {
@@ -103,7 +117,7 @@ export function renderResults(container, books, total, responseTime) {
     }
     
     books.forEach(book => {
-        container.appendChild(createBookCard(book));
+        container.appendChild(createBookCard(book, onBookClick));
     });
 }
 

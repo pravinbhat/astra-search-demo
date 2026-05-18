@@ -1,6 +1,6 @@
 import { createBookCard } from './searchResults.js';
 
-export function renderComparisonResults(results) {
+export function renderComparisonResults(results, onBookClick) {
     const modes = ['semantic', 'lexical', 'hybrid'];
     
     modes.forEach(mode => {
@@ -59,7 +59,7 @@ export function renderComparisonResults(results) {
         }
         
         modeResults.library_books.forEach(book => {
-            const card = createBookCard(book);
+            const card = createBookCard(book, onBookClick);
             container.appendChild(card);
         });
     });

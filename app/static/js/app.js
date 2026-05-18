@@ -3,6 +3,7 @@ import { FilterBuilder } from './components/filterBuilder.js';
 import * as SearchResults from './components/searchResults.js';
 import * as ComparisonView from './components/comparisonView.js';
 import * as AddBookForm from './components/addBookForm.js';
+import * as BookDetailsModal from './components/bookDetailsModal.js';
 
 const state = {
     currentMode: 'filter',
@@ -23,6 +24,9 @@ function init() {
     
     // Initialize add book form
     AddBookForm.init();
+    
+    // Initialize book details modal
+    BookDetailsModal.init();
     
     // Setup event listeners
     setupModeTabListeners();
@@ -151,7 +155,8 @@ async function handleFilterSearch() {
             resultsGrid,
             result.library_books,
             result.total,
-            result.responseTime
+            result.responseTime,
+            BookDetailsModal.showBookDetails
         );
         
         SearchResults.hideLoading();
@@ -186,7 +191,8 @@ async function handleSemanticSearch() {
             resultsGrid,
             result.library_books,
             result.total,
-            result.responseTime
+            result.responseTime,
+            BookDetailsModal.showBookDetails
         );
         
         SearchResults.hideLoading();
@@ -221,7 +227,8 @@ async function handleLexicalSearch() {
             resultsGrid,
             result.library_books,
             result.total,
-            result.responseTime
+            result.responseTime,
+            BookDetailsModal.showBookDetails
         );
         
         SearchResults.hideLoading();
@@ -257,7 +264,8 @@ async function handleHybridSearch() {
             resultsGrid,
             result.library_books,
             result.total,
-            result.responseTime
+            result.responseTime,
+            BookDetailsModal.showBookDetails
         );
         
         SearchResults.hideLoading();
@@ -286,7 +294,7 @@ async function handleComparisonSearch() {
         
         const results = await API.comparisonSearch(query, keywords, null, 20);
         
-        ComparisonView.renderComparisonResults(results);
+        ComparisonView.renderComparisonResults(results, BookDetailsModal.showBookDetails);
         
         const summary = ComparisonView.generateComparisonSummary(results);
         ComparisonView.displayComparisonSummary(summary);
@@ -386,5 +394,6 @@ window.AstraSearchDemo = {
     API,
     SearchResults,
     ComparisonView,
-    AddBookForm
+    AddBookForm,
+    BookDetailsModal
 };
