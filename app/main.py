@@ -4,8 +4,11 @@ FastAPI application entry point.
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.config import settings
 from app.database import astra_connection_manager, library_book_repository
@@ -65,17 +68,38 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(books.router)
 
+# Mount static files
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    logger.info(f"Mounted static files from {static_dir}")
+
 
 @app.get("/", tags=["Root"])
 async def root():
     """
-    Root endpoint with basic application information.
+    Return API information.
     """
     return {
         "message": f"Welcome to {settings.app_name}",
         "version": settings.app_version,
         "docs": "/docs",
         "health": "/health"
+    }
+
+
+@app.get("/ui", tags=["Frontend"])
+async def serve_ui():
+    """
+    Serve the frontend UI.
+    """
+    index_file = static_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    
+    return {
+        "error": "Frontend UI not found",
+        "message": "Please check app/static/index.html"
     }
 
 

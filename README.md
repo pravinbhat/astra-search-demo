@@ -21,17 +21,20 @@ python -m scripts.db_hydrate_collection
 uvicorn app.main:app --reload
 
 # 4. Open your browser
-# Navigate to http://localhost:8000/docs
+# Navigate to http://localhost:8000
 ```
+
+The application includes both a **REST API** and a **web-based UI** for exploring search capabilities.
 
 ## Documentation
 
-| Document                                 | Description                    |
-| ------------------------------------------| --------------------------------|
-| [SETUP.md](SETUP.md)                     | Installation and configuration |
-| [API.md](API.md)                         | REST API reference             |
-| [SEARCH_API.md](SEARCH_API.md)           | Search endpoint details        |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions    |
+| Document | Description |
+|----------|-------------|
+| [SETUP.md](SETUP.md) | Installation and configuration |
+| [UI.md](UI.md) | Web UI features and usage |
+| [API.md](API.md) | REST API reference |
+| [SEARCH_API.md](SEARCH_API.md) | Search endpoint details |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
 
 ## What this demo is for
 
@@ -102,6 +105,11 @@ This project includes a **modern web UI** built with vanilla JavaScript that pro
 - 📝 **Lexical Search** - Traditional keyword-based search
 - ⚡ **Hybrid Search** - Combined semantic and lexical search
 - 📊 **Comparison Mode** - Side-by-side results from all search modes
+
+**Access the UI**: Start the server and navigate to `http://localhost:8000`
+
+See [UI.md](UI.md) for complete UI documentation.
+
 
 ## What this demo includes:
 

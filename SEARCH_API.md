@@ -1,6 +1,6 @@
 # Search API
 
-Search endpoint for querying library books using filters, semantic, lexical, or hybrid search. For the web UI, see [FRONTEND.md](FRONTEND.md).
+Search endpoint for querying library books using filters, semantic, lexical, or hybrid search. For the web UI, see [UI.md](UI.md).
 
 **Endpoint:** `POST /api/library-books/search`
 

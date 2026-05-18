@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astra Search Demo - Library Book Search</title>
+    <meta name="description" content="AI-powered library book search using AstraDB's multi-modal retrieval capabilities">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">📚</span>
+                    Astra Search Demo
+                    <span class="tagline-inline">| AI-Powered Library Book Search</span>
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="search-modes" role="tablist" aria-label="Search modes">
+                <button class="mode-tab active" data-mode="filter" role="tab" aria-selected="true" aria-controls="filter-panel">
+                    <span class="mode-icon">🔍</span>
+                    <span class="mode-label">Filter Search</span>
+                    <span class="mode-description">Metadata filtering</span>
+                </button>
+                <button class="mode-tab" data-mode="semantic" role="tab" aria-selected="false" aria-controls="semantic-panel">
+                    <span class="mode-icon">🧠</span>
+                    <span class="mode-label">Semantic Search</span>
+                    <span class="mode-description">Natural language</span>
+                </button>
+                <button class="mode-tab" data-mode="lexical" role="tab" aria-selected="false" aria-controls="lexical-panel">
+                    <span class="mode-icon">📝</span>
+                    <span class="mode-label">Lexical Search</span>
+                    <span class="mode-description">Keyword matching</span>
+                </button>
+                <button class="mode-tab" data-mode="hybrid" role="tab" aria-selected="false" aria-controls="hybrid-panel">
+                    <span class="mode-icon">⚡</span>
+                    <span class="mode-label">Hybrid Search</span>
+                    <span class="mode-description">Combined approach</span>
+                </button>
+                <button class="mode-tab" data-mode="comparison" role="tab" aria-selected="false" aria-controls="comparison-panel">
+                    <span class="mode-icon">📊</span>
+                    <span class="mode-label">Compare Modes</span>
+                    <span class="mode-description">Side-by-side</span>
+                </button>
+            </section>
+
+            <div class="search-panels">
+                <div id="filter-panel" class="search-panel active" role="tabpanel" aria-labelledby="filter-tab">
+                    <div class="panel-header">
+                        <h2>Filter Search</h2>
+                        <p class="panel-description">Search books using metadata filters (author, genre, rating, etc.)</p>
+                    </div>
+                    <div id="filter-builder" class="filter-builder"></div>
+                    <div class="search-actions">
+                        <button id="filter-search-btn" class="btn btn-primary">
+                            <span class="btn-icon">🔍</span>
+                            Search Books
+                        </button>
+                        <button id="filter-clear-btn" class="btn btn-secondary">Clear Filters</button>
+                    </div>
+                </div>
+
+                <div id="semantic-panel" class="search-panel" role="tabpanel" aria-labelledby="semantic-tab">
+                    <div class="panel-header">
+                        <h2>Semantic Search</h2>
+                        <p class="panel-description">Search using natural language queries powered by vector embeddings</p>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="semantic-query" class="input-label">Natural Language Query</label>
+                        <textarea 
+                            id="semantic-query" 
+                            class="search-textarea" 
+                            placeholder="e.g., books about resilience and survival in dystopian futures"
+                            rows="3"
+                            aria-describedby="semantic-help"
+                        ></textarea>
+                        <p id="semantic-help" class="input-help">Describe what you're looking for in natural language</p>
+                    </div>
+                    <details class="filter-accordion">
+                        <summary>Optional: Add Metadata Filters</summary>
+                        <div id="semantic-filter-builder" class="filter-builder"></div>
+                    </details>
+                    <div class="search-actions">
+                        <button id="semantic-search-btn" class="btn btn-primary">
+                            <span class="btn-icon">🧠</span>
+                            Semantic Search
+                        </button>
+                        <button id="semantic-clear-btn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div id="lexical-panel" class="search-panel" role="tabpanel" aria-labelledby="lexical-tab">
+                    <div class="panel-header">
+                        <h2>Lexical Search</h2>
+                        <p class="panel-description">Traditional keyword-based search with exact matching</p>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="lexical-keywords" class="input-label">Keywords</label>
+                        <input 
+                            id="lexical-keywords" 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="e.g., dystopian survival quantum"
+                            aria-describedby="lexical-help"
+                        />
+                        <p id="lexical-help" class="input-help">Enter keywords to match in book titles, authors, and summaries</p>
+                    </div>
+                    <details class="filter-accordion">
+                        <summary>Optional: Add Metadata Filters</summary>
+                        <div id="lexical-filter-builder" class="filter-builder"></div>
+                    </details>
+                    <div class="search-actions">
+                        <button id="lexical-search-btn" class="btn btn-primary">
+                            <span class="btn-icon">📝</span>
+                            Lexical Search
+                        </button>
+                        <button id="lexical-clear-btn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div id="hybrid-panel" class="search-panel" role="tabpanel" aria-labelledby="hybrid-tab">
+                    <div class="panel-header">
+                        <h2>Hybrid Search</h2>
+                        <p class="panel-description">Combine semantic understanding with keyword precision</p>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="hybrid-query" class="input-label">Semantic Query</label>
+                        <textarea 
+                            id="hybrid-query" 
+                            class="search-textarea" 
+                            placeholder="e.g., books about space exploration and adventure"
+                            rows="2"
+                        ></textarea>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="hybrid-keywords" class="input-label">Keywords</label>
+                        <input 
+                            id="hybrid-keywords" 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="e.g., Mars mission alien"
+                        />
+                    </div>
+                    <details class="filter-accordion">
+                        <summary>Optional: Add Metadata Filters</summary>
+                        <div id="hybrid-filter-builder" class="filter-builder"></div>
+                    </details>
+                    <div class="search-actions">
+                        <button id="hybrid-search-btn" class="btn btn-primary">
+                            <span class="btn-icon">⚡</span>
+                            Hybrid Search
+                        </button>
+                        <button id="hybrid-clear-btn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div id="comparison-panel" class="search-panel" role="tabpanel" aria-labelledby="comparison-tab">
+                    <div class="panel-header">
+                        <h2>Compare Search Modes</h2>
+                        <p class="panel-description">Run the same query across all search modes and compare results</p>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="comparison-query" class="input-label">Query</label>
+                        <textarea 
+                            id="comparison-query" 
+                            class="search-textarea" 
+                            placeholder="e.g., books about resilience and survival"
+                            rows="2"
+                        ></textarea>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="comparison-keywords" class="input-label">Keywords (for lexical/hybrid)</label>
+                        <input 
+                            id="comparison-keywords" 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="e.g., dystopian survival"
+                        />
+                    </div>
+                    <div class="search-actions">
+                        <button id="comparison-search-btn" class="btn btn-primary">
+                            <span class="btn-icon">📊</span>
+                            Compare All Modes
+                        </button>
+                        <button id="comparison-clear-btn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <section id="results-section" class="results-section" aria-live="polite" aria-atomic="false">
+                <div id="loading-state" class="loading-state hidden">
+                    <div class="spinner"></div>
+                    <p>Searching books...</p>
+                </div>
+
+                <div id="error-state" class="error-state hidden" role="alert">
+                    <span class="error-icon">⚠️</span>
+                    <p id="error-message"></p>
+                </div>
+
+                <div id="empty-state" class="empty-state">
+                    <span class="empty-icon">📚</span>
+                    <h3>Ready to Search</h3>
+                    <p>Select a search mode above and start exploring our library collection</p>
+                </div>
+
+                <div id="results-container" class="results-container hidden">
+                    <div id="single-results" class="single-results">
+                        <div class="results-header">
+                            <h3 id="results-title">Search Results</h3>
+                            <div class="results-meta">
+                                <span id="results-count" class="results-count"></span>
+                                <span id="results-time" class="results-time"></span>
+                            </div>
+                        </div>
+                        <div id="results-grid" class="results-grid"></div>
+                    </div>
+
+                    <div id="comparison-results" class="comparison-results hidden">
+                        <div class="comparison-grid">
+                            <div class="comparison-column">
+                                <div class="comparison-header">
+                                    <h4>Semantic Search</h4>
+                                    <div class="comparison-meta">
+                                        <span class="comparison-count"></span>
+                                        <span class="comparison-time"></span>
+                                    </div>
+                                </div>
+                                <div class="comparison-results-grid" data-mode="semantic"></div>
+                            </div>
+
+                            <div class="comparison-column">
+                                <div class="comparison-header">
+                                    <h4>Lexical Search</h4>
+                                    <div class="comparison-meta">
+                                        <span class="comparison-count"></span>
+                                        <span class="comparison-time"></span>
+                                    </div>
+                                </div>
+                                <div class="comparison-results-grid" data-mode="lexical"></div>
+                            </div>
+
+                            <div class="comparison-column">
+                                <div class="comparison-header">
+                                    <h4>Hybrid Search</h4>
+                                    <div class="comparison-meta">
+                                        <span class="comparison-count"></span>
+                                        <span class="comparison-time"></span>
+                                    </div>
+                                </div>
+                                <div class="comparison-results-grid" data-mode="hybrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Built with <a href="https://astra.datastax.com/" target="_blank">AstraDB</a> |
+               <a href="https://github.com/pravinbhat/astra-search-demo" target="_blank">View Source</a> |
+               <a href="/docs" target="_blank">API Docs</a> |
+               <a href="https://github.com/pravinbhat/astra-search-demo" target="_blank">GitHub</a>
+            </p>
+        </div>
+    </footer>
+
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

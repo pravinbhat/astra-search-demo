@@ -120,8 +120,11 @@ uvicorn app.main:app --reload
 ```
 
 **Access:**
+- Web UI: `http://localhost:8000/`
 - API docs: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
+
+See [UI.md](UI.md) for UI usage or [API.md](API.md) for REST API.
 
 ## Testing
 
