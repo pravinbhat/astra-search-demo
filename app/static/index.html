@@ -263,6 +263,234 @@
         </div>
     </main>
 
+    <!-- Floating Action Button -->
+    <button id="add-book-fab" class="fab" aria-label="Add new book" title="Add Book">
+        <span class="fab-icon">➕</span>
+    </button>
+
+    <!-- Add Book Modal -->
+    <div id="add-book-modal" class="modal hidden" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Book</h2>
+                <button id="modal-close-btn" class="modal-close" aria-label="Close modal">
+                    <span>✕</span>
+                </button>
+            </div>
+            <form id="add-book-form" class="add-book-form">
+                <!-- Basic Information -->
+                <fieldset class="form-section">
+                    <legend>Basic Information</legend>
+                    
+                    <div class="form-group">
+                        <label for="book-title" class="form-label">Title <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="book-title"
+                            name="title"
+                            class="form-input"
+                            required
+                            maxlength="500"
+                            placeholder="Enter book title"
+                        />
+                        <span class="form-error" id="title-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-author" class="form-label">Author <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="book-author"
+                            name="author"
+                            class="form-input"
+                            required
+                            maxlength="300"
+                            placeholder="Enter author name"
+                        />
+                        <span class="form-error" id="author-error"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="book-year" class="form-label">Publication Year <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="book-year"
+                                name="publication_year"
+                                class="form-input"
+                                required
+                                min="1000"
+                                max="9999"
+                                placeholder="e.g., 2024"
+                            />
+                            <span class="form-error" id="year-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="book-pages" class="form-label">Pages <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="book-pages"
+                                name="number_of_pages"
+                                class="form-input"
+                                required
+                                min="1"
+                                placeholder="e.g., 350"
+                            />
+                            <span class="form-error" id="pages-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="book-rating" class="form-label">Rating <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="book-rating"
+                                name="rating"
+                                class="form-input"
+                                required
+                                min="0"
+                                max="5"
+                                step="0.1"
+                                placeholder="0-5"
+                            />
+                            <span class="form-error" id="rating-error"></span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Content -->
+                <fieldset class="form-section">
+                    <legend>Content</legend>
+                    
+                    <div class="form-group">
+                        <label for="book-summary" class="form-label">Summary <span class="required">*</span></label>
+                        <textarea
+                            id="book-summary"
+                            name="summary"
+                            class="form-textarea"
+                            required
+                            rows="4"
+                            placeholder="Enter a brief summary of the book"
+                        ></textarea>
+                        <span class="form-error" id="summary-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-genres" class="form-label">Genres <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="book-genres"
+                            name="genres"
+                            class="form-input"
+                            required
+                            placeholder="e.g., Science Fiction, Adventure (comma-separated)"
+                        />
+                        <span class="form-help">Enter genres separated by commas</span>
+                        <span class="form-error" id="genres-error"></span>
+                    </div>
+                </fieldset>
+
+                <!-- Metadata -->
+                <fieldset class="form-section">
+                    <legend>Metadata</legend>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="book-isbn" class="form-label">ISBN</label>
+                            <input
+                                type="text"
+                                id="book-isbn"
+                                name="isbn"
+                                class="form-input"
+                                placeholder="e.g., 978-0-123456-78-9"
+                            />
+                            <span class="form-error" id="isbn-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="book-language" class="form-label">Language</label>
+                            <select id="book-language" name="language" class="form-input">
+                                <option value="">Select language</option>
+                                <option value="English">English</option>
+                                <option value="Spanish">Spanish</option>
+                                <option value="French">French</option>
+                                <option value="German">German</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Japanese">Japanese</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="form-error" id="language-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="book-edition" class="form-label">Edition</label>
+                            <input
+                                type="text"
+                                id="book-edition"
+                                name="edition"
+                                class="form-input"
+                                placeholder="e.g., 1st Edition"
+                            />
+                            <span class="form-error" id="edition-error"></span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Library Status -->
+                <fieldset class="form-section">
+                    <legend>Library Status</legend>
+                    
+                    <div class="form-group">
+                        <label class="form-checkbox">
+                            <input
+                                type="checkbox"
+                                id="book-checked-out"
+                                name="is_checked_out"
+                            />
+                            <span>Book is currently checked out</span>
+                        </label>
+                    </div>
+
+                    <div id="checkout-fields" class="checkout-fields hidden">
+                        <div class="form-group">
+                            <label for="book-borrower" class="form-label">Borrower Name</label>
+                            <input
+                                type="text"
+                                id="book-borrower"
+                                name="borrower"
+                                class="form-input"
+                                placeholder="Enter borrower name"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="book-due-date" class="form-label">Due Date</label>
+                            <input
+                                type="date"
+                                id="book-due-date"
+                                name="due_date"
+                                class="form-input"
+                            />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" id="form-cancel-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="form-submit-btn" class="btn btn-primary">
+                        <span class="btn-icon">💾</span>
+                        Add Book
+                    </button>
+                </div>
+
+                <!-- Form Status Messages -->
+                <div id="form-status" class="form-status hidden"></div>
+            </form>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="container">
             <p>Built with <a href="https://astra.datastax.com/" target="_blank">AstraDB</a> |

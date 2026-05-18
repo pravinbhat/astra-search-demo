@@ -16,7 +16,7 @@ class LibraryBookBase(BaseModel):
     publication_year: int = Field(..., description="Year the book was published", ge=1000, le=9999)
     summary: str = Field(..., description="Book summary", min_length=1)
     genres: List[str] = Field(..., description="List of book genres")
-    metadata: dict = Field(..., description="Book metadata (isbn, language, edition)")
+    metadata: Optional[dict] = Field(None, description="Book metadata (isbn, language, edition)")
     is_checked_out: bool = Field(..., description="Whether the book is currently checked out")
     borrower: Optional[str] = Field(None, description="Name of the borrower if checked out")
     due_date: Optional[str] = Field(None, description="Due date if checked out")

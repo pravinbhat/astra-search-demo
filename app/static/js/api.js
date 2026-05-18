@@ -119,9 +119,29 @@ export async function hybridSearch(query, keywords, filter = null, skip = 0, lim
     return searchBooks(params);
 }
 
+export async function createBook(bookData) {
+    return apiRequest('', {
+        method: 'POST',
+        body: JSON.stringify(bookData),
+    });
+}
+
 export async function getBook(bookId) {
     return apiRequest(`/${bookId}`, {
         method: 'GET',
+    });
+}
+
+export async function updateBook(bookId, bookData) {
+    return apiRequest(`/${bookId}`, {
+        method: 'PUT',
+        body: JSON.stringify(bookData),
+    });
+}
+
+export async function deleteBook(bookId) {
+    return apiRequest(`/${bookId}`, {
+        method: 'DELETE',
     });
 }
 

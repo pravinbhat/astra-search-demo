@@ -2,6 +2,7 @@ import * as API from './api.js';
 import { FilterBuilder } from './components/filterBuilder.js';
 import * as SearchResults from './components/searchResults.js';
 import * as ComparisonView from './components/comparisonView.js';
+import * as AddBookForm from './components/addBookForm.js';
 
 const state = {
     currentMode: 'filter',
@@ -20,10 +21,14 @@ function init() {
         hybrid: new FilterBuilder('hybrid-filter-builder')
     };
     
+    // Initialize add book form
+    AddBookForm.init();
+    
     // Setup event listeners
     setupModeTabListeners();
     setupSearchButtonListeners();
     setupClearButtonListeners();
+    setupBookAddedListener();
     
     // Set initial mode
     switchMode('filter');
@@ -297,6 +302,38 @@ async function handleComparisonSearch() {
     }
 }
 
+function setupBookAddedListener() {
+    // Listen for book added event to optionally refresh results
+    window.addEventListener('bookAdded', (event) => {
+        console.log('Book added:', event.detail);
+        
+        // Show a success notification
+        const notification = document.createElement('div');
+        notification.className = 'notification success';
+        notification.textContent = `✓ "${event.detail.title}" has been added to the library`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    });
+}
+
 function setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -348,5 +385,6 @@ window.AstraSearchDemo = {
     state,
     API,
     SearchResults,
-    ComparisonView
+    ComparisonView,
+    AddBookForm
 };
