@@ -17,11 +17,21 @@ The application interacts with a `library_books` collection leveraging AstraDB's
 python -m scripts.db_create_collection
 python -m scripts.db_hydrate_collection
 
-# 3. Run the API
+# 3. Run the application
 uvicorn app.main:app --reload
+
+# 4. Open your browser
+# Navigate to http://localhost:8000/docs
 ```
 
-See [SETUP.md](SETUP.md) for detailed instructions.
+## Documentation
+
+| Document                                 | Description                    |
+| ------------------------------------------| --------------------------------|
+| [SETUP.md](SETUP.md)                     | Installation and configuration |
+| [API.md](API.md)                         | REST API reference             |
+| [SEARCH_API.md](SEARCH_API.md)           | Search endpoint details        |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions    |
 
 ## What this demo is for
 
@@ -83,44 +93,28 @@ Notes:
 - the dataset is included in `data/quickstart_dataset.json` for easy hydration
 - embeddings are generated automatically in the SaaS DB layer using NVIDIA's embedding model
 
-## Why this matters
+## User Interface
 
-AstraDB search supports:
+This project includes a **modern web UI** built with vanilla JavaScript that provides:
 
-- metadata based search filters
-- semantic similarity search from vectors
-- keyword / lexical matching from text search
-- hybrid search using any combination of the above 
+- 🔍 **Filter Search** - Dynamic filter builder for metadata-based queries
+- 🧠 **Semantic Search** - Natural language queries using vector embeddings
+- 📝 **Lexical Search** - Traditional keyword-based search
+- ⚡ **Hybrid Search** - Combined semantic and lexical search
+- 📊 **Comparison Mode** - Side-by-side results from all search modes
 
-That makes a library books dataset like this useful for questions such as:
-
-- "find books similar to this summary"
-- "find dystopian books with high ratings"
-- "find books by specific authors with certain themes"
-- "find books semantically similar to a user query, while also matching specific genre or rating filters"
-
-## Documentation
-
-- [SETUP.md](SETUP.md) — installation, configuration, testing, and local run instructions
-- [API.md](API.md) — endpoint contract, payloads, and response examples
-- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — common issues and fixes
-
-## What's next
-
-This demo currently includes:
+## What this demo includes:
 
 - ✅ Semantic vector search using AstraDB's `$vectorize` feature
+- ✅ Lexical keyword search using AstraDB's `$lexical` operator
+- ✅ Hybrid search combining vector and lexical search using `$hybrid`
 - ✅ Filter-based search with predicate operators
 - ✅ Semantic filter search combining vector search with metadata filters
+- ✅ Lexical filter search combining keyword matching with metadata filters
+- ✅ Hybrid filter search combining all search modes
 - ✅ Metadata filtering by author, genres, rating, publication year, checkout status, and more
 
 See [SEARCH_API.md](SEARCH_API.md) for complete search endpoint documentation.
-
-Potential future enhancements:
-
-- Lexical search using AstraDB's `$lexical` operator for keyword matching
-- Hybrid search combining vector, lexical, and filter approaches using `$hybrid`
-- Search result relevance tuning (using reranker)
 
 ## Resources
 

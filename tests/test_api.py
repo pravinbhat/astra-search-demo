@@ -251,4 +251,103 @@ class TestLibraryBooksEndpoint:
         assert "total" in data
         assert isinstance(data["library_books"], list)
 
+    def test_search_library_books_with_keywords(self):
+        """Test lexical search request is accepted and returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "keywords": "dystopian survival",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+    def test_search_library_books_with_query_and_keywords(self):
+        """Test hybrid search request is accepted and returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "query": "books about resilience and hope",
+                "keywords": "dystopian survival",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+        # Hybrid search should include similarity scores
+        for book in data["library_books"]:
+            assert "$similarity" in book or book.get("$similarity") is None
+
+    def test_search_library_books_with_filter_and_keywords(self):
+        """Test lexical filter search request is accepted and returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "filter": {"genres": {"$in": ["Science Fiction"]}},
+                "keywords": "alien planet discovery",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+    def test_search_library_books_with_filter_query_and_keywords(self):
+        """Test hybrid filter search request is accepted and returns the expected response shape."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}},
+                "query": "space exploration adventure",
+                "keywords": "alien planet discovery",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
+        # Hybrid search should include similarity scores
+        for book in data["library_books"]:
+            assert "$similarity" in book or book.get("$similarity") is None
+
+    def test_search_library_books_empty_strings_fallback(self):
+        """Test that empty strings for query and keywords fall back to filter-only search."""
+        response = client.post(
+            "/api/library-books/search",
+            json={
+                "filter": {"author": "John Anthony"},
+                "query": "",
+                "keywords": "",
+                "skip": 0,
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "library_books" in data
+        assert "total" in data
+        assert isinstance(data["library_books"], list)
+
 # Made with Bob

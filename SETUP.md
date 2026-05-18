@@ -119,63 +119,21 @@ The sample dataset includes library books with:
 uvicorn app.main:app --reload
 ```
 
-Once running:
-
-- API base URL: `http://localhost:8000`
+**Access:**
+- API docs: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## Testing
 
-The project includes comprehensive API tests using pytest.
-
-### Running Tests
-
-Run all tests:
+Run tests with pytest:
 
 ```bash
-pytest
+pytest                    # Run all tests
+pytest -v                 # Verbose output
+pytest tests/test_api.py  # Run specific test file
 ```
 
-Run tests with verbose output:
-
-```bash
-pytest -v
-```
-
-Run specific test classes:
-
-```bash
-pytest tests/test_api.py::TestHealthEndpoint
-pytest tests/test_api.py::TestLibraryBooksEndpoint
-```
-
-Run a specific test:
-
-```bash
-pytest tests/test_api.py::TestHealthEndpoint::test_health_check
-```
-
-### Test Coverage
-
-The test suite includes:
-
-- **Health Check Tests** - Verify API health endpoint and database connectivity
-- **Root Endpoint Tests** - Validate welcome message and API metadata
-- **CRUD Operations Tests** - Test create, read, update, and delete operations for library books
-- **Error Handling Tests** - Verify 404 responses for non-existent resources
-
-### Test Configuration
-
-Test configuration is managed in `pytest.ini`:
-- Async test support enabled
-- Verbose output by default
-- Short traceback format for readability
-
-### Test Fixtures
-
-The test suite uses fixtures defined in `tests/conftest.py` for:
-- Automatic cleanup of test data
-- Isolated test execution
-- Database state management
+The test suite covers health checks, CRUD operations, and error handling.
 
 ## Additional Resources
 

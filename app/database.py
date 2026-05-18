@@ -270,7 +270,7 @@ class LibraryBookRepository:
 
             total = collection.count_documents(predicates, upper_bound=1000000)
             cursor = collection.find(
-                predicates,
+                filter=predicates,
                 sort={"$vectorize": query},
                 limit=skip + limit,
                 include_similarity=True
@@ -292,6 +292,95 @@ class LibraryBookRepository:
             return [], 0
         except Exception as e:
             logger.error(f"Unexpected error performing semantic search for library books: {str(e)}")
+            return [], 0
+
+    async def lexical_search_library_books(
+        self,
+        keywords: str,
+        filter_predicates: Optional[Dict[str, Any]] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """Search library book documents using lexical keyword matching."""
+        try:
+            collection = self._ensure_collection()
+            predicates = filter_predicates or {}
+
+            total = collection.count_documents(predicates, upper_bound=1000000)
+            
+            # Use find_and_rerank with $hybrid in sort for lexical search
+            cursor = collection.find_and_rerank(
+                filter=predicates,
+                sort={"$hybrid": keywords},  # Use $hybrid with query text for lexical
+                limit=skip + limit
+            )
+            
+            library_books = []
+            for index, reranked_result in enumerate(cursor):
+                if index < skip:
+                    continue
+                # Extract the document from RerankedResult
+                doc = reranked_result.document
+                library_books.append(self._normalize_library_book_document(doc))
+                if len(library_books) >= limit:
+                    break
+
+            logger.info(f"Lexical search completed: found {total} documents, returning {len(library_books)}")
+            return library_books, total
+
+        except DataAPIException as e:
+            logger.error(f"Failed to perform lexical search for library books: {str(e)}")
+            return [], 0
+        except Exception as e:
+            logger.error(f"Unexpected error performing lexical search for library books: {str(e)}")
+            return [], 0
+
+    async def hybrid_search_library_books(
+        self,
+        query: str,
+        keywords: str,
+        filter_predicates: Optional[Dict[str, Any]] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> tuple[List[Dict[str, Any]], int]:
+        """Search library book documents using hybrid vector + lexical search."""
+        try:
+            collection = self._ensure_collection()
+            predicates = filter_predicates or {}
+
+            total = collection.count_documents(predicates, upper_bound=1000000)
+            
+            # Use find_and_rerank with $hybrid containing both $vectorize and $lexical
+            cursor = collection.find_and_rerank(
+                filter=predicates,
+                sort={
+                    "$hybrid": {
+                        "$vectorize": query,
+                        "$lexical": keywords
+                    }
+                },
+                limit=skip + limit,
+                include_scores=True
+            )
+            library_books = []
+
+            for index, reranked_result in enumerate(cursor):
+                if index < skip:
+                    continue
+                # Extract the document from RerankedResult
+                doc = reranked_result.document
+                library_books.append(self._normalize_library_book_document(doc))
+                if len(library_books) >= limit:
+                    break
+
+            logger.info(f"Hybrid search completed: found {total} documents, returning {len(library_books)}")
+            return library_books, total
+
+        except DataAPIException as e:
+            logger.error(f"Failed to perform hybrid search for library books: {str(e)}")
+            return [], 0
+        except Exception as e:
+            logger.error(f"Unexpected error performing hybrid search for library books: {str(e)}")
             return [], 0
 
 

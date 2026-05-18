@@ -86,15 +86,18 @@ class HealthResponse(BaseModel):
 
 
 class LibraryBookSearchRequest(BaseModel):
-    """Schema for filter, semantic, and semantic filter search requests."""
+    """Schema for filter, semantic, lexical, and hybrid search requests."""
     filter: Dict[str, Any] = Field(
         default_factory=dict,
         description="Filter predicates for searching documents (e.g., {'author': 'John Anthony', 'rating': {'$gte': 4.0}})"
     )
     query: Optional[str] = Field(
         None,
-        description="Semantic search query used for AstraDB vector search",
-        min_length=1
+        description="Semantic search query used for AstraDB vector search"
+    )
+    keywords: Optional[str] = Field(
+        None,
+        description="Lexical search keywords for text matching"
     )
     skip: int = Field(0, ge=0, description="Number of documents to skip")
     limit: int = Field(100, ge=1, le=1000, description="Maximum number of documents to return")
@@ -109,6 +112,17 @@ class LibraryBookSearchRequest(BaseModel):
                 },
                 {
                     "query": "books about resilience and survival",
+                    "skip": 0,
+                    "limit": 10
+                },
+                {
+                    "keywords": "dystopian survival",
+                    "skip": 0,
+                    "limit": 10
+                },
+                {
+                    "query": "books about resilience",
+                    "keywords": "dystopian survival",
                     "skip": 0,
                     "limit": 10
                 },

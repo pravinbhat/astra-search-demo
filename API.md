@@ -1,14 +1,10 @@
 # API Reference
 
-This document contains the API contract for working with the `library_books` collection through the `library_book` entity.
+REST API endpoints for the `library_books` collection.
 
-## Base URL
+**Base URL:** `http://localhost:8000`
 
-```text
-http://localhost:8000
-```
-
-## Endpoints Quick Reference
+## Endpoints
 
 | Method | Endpoint | Description | Status Codes |
 |--------|----------|-------------|--------------|
@@ -118,33 +114,7 @@ curl -X DELETE http://localhost:8000/api/library-books/{library_book_id}
 
 ## Response shape
 
-Example single book response:
-
-```json
-{
-  "id": "doc-id-123",
-  "title": "The Great Gatsby",
-  "author": "F. Scott Fitzgerald",
-  "number_of_pages": 180,
-  "rating": 4.5,
-  "publication_year": 1925,
-  "summary": "A classic American novel set in the Jazz Age.",
-  "genres": ["Fiction", "Classic"],
-  "metadata": {
-    "isbn": "978-0-7432-7356-5",
-    "language": "English",
-    "edition": "First Edition"
-  },
-  "is_checked_out": false,
-  "borrower": null,
-  "due_date": null,
-  "$vectorize": null,
-  "$similarity": 0.91,
-  "embedding": null
-}
-```
-
-Example list response:
+List response with pagination:
 
 ```json
 {
@@ -166,28 +136,11 @@ Example list response:
       "is_checked_out": false,
       "borrower": null,
       "due_date": null,
-      "$vectorize": null,
-      "$similarity": 0.91,
-      "embedding": null
+      "$similarity": 0.91
     }
   ],
   "total": 1
 }
 ```
 
-## Field descriptions
-
-- `title`: Book title (required)
-- `author`: Book author (required)
-- `number_of_pages`: Number of pages in the book (required, positive integer)
-- `rating`: Book rating from 0 to 5 (required)
-- `publication_year`: Year the book was published (required, 1000-9999)
-- `summary`: Book summary or description (required)
-- `genres`: Array of genre strings (required)
-- `metadata`: Object containing ISBN, language, and edition (required)
-- `is_checked_out`: Whether the book is currently checked out (required, boolean)
-- `borrower`: Name of the person who borrowed the book (optional, null if not checked out)
-- `due_date`: Due date for return if checked out (optional, ISO 8601 format string)
-- `$vectorize`: Text used for embedding generation (optional, typically summary + genres)
-- `$similarity`: Similarity score returned by AstraDB for semantic search results (optional)
-- `embedding`: Vector embedding (read-only, managed by AstraDB)
+Single book responses return the same structure without the `library_books` array wrapper.

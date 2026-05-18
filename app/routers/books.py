@@ -88,7 +88,7 @@ async def list_library_books(
     response_model=LibraryBookListResponse,
     status_code=status.HTTP_200_OK,
     summary="Search Library Books",
-    description="Search library book documents using filters, semantic queries, or both",
+    description="Search library book documents using filters, semantic, lexical, or hybrid search",
     responses={
         200: {"description": "Search completed successfully"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
@@ -96,15 +96,17 @@ async def list_library_books(
 )
 async def search_library_books(search_filter: LibraryBookSearchRequest) -> LibraryBookListResponse:
     """
-    Search library book documents using filters, semantic queries, or both.
+    Search library book documents using multiple search modes.
     
-    Supported search modes:
+    Supported search modes (determined by field presence):
     - Filter search: {"filter": {"author": "John Anthony"}}
     - Semantic search: {"query": "books about resilience and survival"}
-    - Semantic filter search: {"filter": {"genres": {"$in": ["Science Fiction"]}}, "query": "books about space exploration"}
+    - Lexical search: {"keywords": "dystopian survival"}
+    - Hybrid search: {"query": "books about resilience", "keywords": "dystopian survival"}
+    - Any mode + filter: Applies metadata constraints to results
     
     Args:
-        search_filter: Search request containing filter predicates, optional semantic query, skip, and limit
+        search_filter: Search request containing optional filter, query, keywords, skip, and limit
         
     Returns:
         List of matching library book documents with total count
@@ -119,19 +121,47 @@ async def search_library_books(search_filter: LibraryBookSearchRequest) -> Libra
         # Semantic search by query
         {"query": "books about resilience and survival", "skip": 0, "limit": 10}
         
-        # Semantic filter search
-        {"filter": {"genres": {"$in": ["Science Fiction", "Fantasy"]}}, "query": "books about space exploration", "skip": 0, "limit": 20}
+        # Lexical search by keywords
+        {"keywords": "dystopian survival", "skip": 0, "limit": 10}
+        
+        # Hybrid search (vector + lexical)
+        {"query": "books about resilience", "keywords": "dystopian survival", "skip": 0, "limit": 10}
+        
+        # Hybrid search with filter
+        {"filter": {"genres": {"$in": ["Science Fiction"]}}, "query": "space exploration", "keywords": "alien planet", "skip": 0, "limit": 20}
     """
     try:
         query = search_filter.query.strip() if search_filter.query else None
-        if query:
+        keywords = search_filter.keywords.strip() if search_filter.keywords else None
+        
+        # Determine search mode based on field presence
+        if query and keywords:
+            # Hybrid search: vector + lexical
+            library_books, total = await library_book_repository.hybrid_search_library_books(
+                query=query,
+                keywords=keywords,
+                filter_predicates=search_filter.filter,
+                skip=search_filter.skip,
+                limit=search_filter.limit
+            )
+        elif query:
+            # Semantic search only
             library_books, total = await library_book_repository.semantic_search_library_books(
                 query=query,
                 filter_predicates=search_filter.filter,
                 skip=search_filter.skip,
                 limit=search_filter.limit
             )
+        elif keywords:
+            # Lexical search only
+            library_books, total = await library_book_repository.lexical_search_library_books(
+                keywords=keywords,
+                filter_predicates=search_filter.filter,
+                skip=search_filter.skip,
+                limit=search_filter.limit
+            )
         else:
+            # Filter/metadata search only
             library_books, total = await library_book_repository.search_library_books(
                 filter_predicates=search_filter.filter,
                 skip=search_filter.skip,

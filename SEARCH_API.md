@@ -1,16 +1,20 @@
-# Search API Documentation
+# Search API
 
-## Overview
+Search endpoint for querying library books using filters, semantic, lexical, or hybrid search. For the web UI, see [FRONTEND.md](FRONTEND.md).
 
-The search endpoint allows you to query library books using filter predicates, semantic queries, or both, powered by AstraDB's Data API via the astrapy package.
+**Endpoint:** `POST /api/library-books/search`
 
 ## Search Modes
 
-| Mode                       | Use Case                                        | Request Fields     | Example                                     |
-| ----------------------------| -------------------------------------------------| --------------------| ---------------------------------------------|
-| **Filter Search**          | Query by metadata (author, genre, rating, etc.) | `filter` only      | Find all books by "John Anthony"            |
-| **Semantic Search**        | Query by meaning/concepts                       | `query` only       | Find "books about resilience and survival"  |
-| **Semantic Filter Search** | Combine semantic + metadata constraints         | `filter` + `query` | Find sci-fi books about "space exploration" |
+| Mode                       | Use Case                                        | Request Fields          | Example                                     |
+| ----------------------------| -------------------------------------------------| ------------------------| ---------------------------------------------|
+| **Filter Search**          | Query by metadata (author, genre, rating, etc.) | `filter` only           | Find all books by "John Anthony"            |
+| **Semantic Search**        | Query by meaning/concepts                       | `query` only            | Find "books about resilience and survival"  |
+| **Lexical Search**         | Query by keyword matching                       | `keywords` only         | Find books with "dystopian survival"        |
+| **Hybrid Search**          | Combine vector + lexical search                 | `query` + `keywords`    | Find books semantically + keyword match     |
+| **Semantic Filter Search** | Combine semantic + metadata constraints         | `filter` + `query`      | Find sci-fi books about "space exploration" |
+| **Lexical Filter Search**  | Combine lexical + metadata constraints          | `filter` + `keywords`   | Find sci-fi books with "alien planet"       |
+| **Hybrid Filter Search**   | Combine hybrid + metadata constraints           | `filter` + `query` + `keywords` | Find sci-fi books with semantic + lexical |
 
 ## Endpoint
 
@@ -24,6 +28,7 @@ The search endpoint allows you to query library books using filter predicates, s
     // Optional filter predicates (see examples below)
   },
   "query": "Optional semantic search query",
+  "keywords": "Optional lexical search keywords",
   "skip": 0,
   "limit": 100
 }
@@ -33,19 +38,9 @@ The search endpoint allows you to query library books using filter predicates, s
 
 - **filter** (optional): Dictionary containing filter predicates for searching documents
 - **query** (optional): Semantic search query/prompt used for AstraDB vector search
+- **keywords** (optional): Lexical search keywords for text matching
 - **skip** (optional): Number of documents to skip for pagination (default: 0, min: 0)
 - **limit** (optional): Maximum number of documents to return (default: 100, min: 1, max: 1000)
-
-## Search Modes
-
-### 1. Filter Search
-Use only the `filter` field to perform predicate-based search.
-
-### 2. Semantic Search
-Use only the `query` field to perform semantic vector search.
-
-### 3. Semantic Filter Search
-Use both `filter` and `query` to constrain semantic search results using metadata predicates.
 
 ## Filter Operators
 
@@ -116,14 +111,8 @@ Combine multiple filter conditions (implicit AND).
       "publication_year": 2020,
       "summary": "Book summary...",
       "genres": ["Fiction", "Drama"],
-      "metadata": {
-        "isbn": "978-1-234567-89-0",
-        "language": "English",
-        "edition": "First Edition"
-      },
+      "metadata": { "isbn": "978-1-234567-89-0", "language": "English" },
       "is_checked_out": false,
-      "borrower": null,
-      "due_date": null,
       "$similarity": 0.91
     }
   ],
@@ -157,7 +146,32 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
   }'
 ```
 
-### 3. Semantic Filter Search by Genre
+### 3. Lexical Search by Keywords
+
+```bash
+curl -X POST "http://localhost:8000/api/library-books/search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "keywords": "dystopian survival",
+    "skip": 0,
+    "limit": 10
+  }'
+```
+
+### 4. Hybrid Search (Vector + Lexical)
+
+```bash
+curl -X POST "http://localhost:8000/api/library-books/search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "books about resilience and hope",
+    "keywords": "dystopian survival",
+    "skip": 0,
+    "limit": 10
+  }'
+```
+
+### 5. Hybrid Search with Filter
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
@@ -165,73 +179,14 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
   -d '{
     "filter": {
       "genres": {"$in": ["Science Fiction", "Fantasy"]},
+      "rating": {"$gte": 4.0},
       "is_checked_out": false
     },
-    "query": "books about space exploration and adventure",
+    "query": "space exploration adventure",
+    "keywords": "alien planet discovery",
     "skip": 0,
-    "limit": 50
+    "limit": 20
   }'
-```
-
-### 4. Filter Search by Publication Year Range
-
-```bash
-curl -X POST "http://localhost:8000/api/library-books/search" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "filter": {
-      "publication_year": {"$gte": 2000, "$lte": 2020}
-    },
-    "skip": 0,
-    "limit": 100
-  }'
-```
-
-### 5. Semantic Filter Search with Multiple Criteria
-
-```bash
-curl -X POST "http://localhost:8000/api/library-books/search" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "filter": {
-      "author": "John Anthony",
-      "rating": {"$gte": 3.5},
-      "number_of_pages": {"$lt": 500},
-      "is_checked_out": false
-    },
-    "query": "books about ambition and social class",
-    "skip": 0,
-    "limit": 25
-  }'
-```
-
-## Python Example
-
-```python
-import requests
-
-# Semantic filter search for available science fiction books
-response = requests.post(
-    "http://localhost:8000/api/library-books/search",
-    json={
-        "filter": {
-            "genres": {"$in": ["Science Fiction"]},
-            "rating": {"$gte": 4.0},
-            "is_checked_out": False
-        },
-        "query": "books about futuristic worlds and survival",
-        "skip": 0,
-        "limit": 10
-    }
-)
-
-data = response.json()
-print(f"Found {data['total']} books")
-for book in data['library_books']:
-    print(
-        f"- {book['title']} by {book['author']} "
-        f"(Rating: {book['rating']}, Similarity: {book.get('$similarity')})"
-    )
 ```
 
 ## Error Responses
@@ -245,24 +200,11 @@ for book in data['library_books']:
 
 ## Notes
 
-- The search uses AstraDB's native filter capabilities and vector search support via the astrapy package
-- All filter operations are performed server-side for optimal performance
-- Semantic search uses the collection's `$vectorize` configuration
+- All search operations are performed server-side by AstraDB for optimal performance
+- **Semantic search** finds documents by meaning and concepts using AI embeddings
+- **Lexical search** finds documents by exact keyword matching
+- **Hybrid search** combines both semantic and lexical approaches for best results
 - Pagination is supported through `skip` and `limit` parameters
-- The `total` field in the response indicates the number of results iterated for the current search mode
-- Empty filter `{}` with no query will return all documents (subject to pagination limits)
-- Semantic results may include AstraDB's `$similarity` field
-
-## Implementation Details
-
-The search endpoint is implemented using:
-- **FastAPI** for the REST API framework
-- **astrapy** for AstraDB Data API integration
-- **Pydantic** for request/response validation
-
-The search flow:
-1. Request validation using `LibraryBookSearchRequest` Pydantic model
-2. Filter-only requests call `db_client.search_library_books()`
-3. Requests with `query` call `db_client.semantic_search_library_books()`
-4. AstraDB collection's `find()` method executes the query with optional vector sorting
-5. Results are normalized and returned with total count
+- The `total` field in the response indicates the total number of matching documents
+- Empty filter `{}` with no query or keywords will return all documents (subject to pagination limits)
+- Semantic and hybrid results may include a `$similarity` score indicating relevance
