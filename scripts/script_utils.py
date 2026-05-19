@@ -2,9 +2,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from astrapy.constants import VectorMetric
 from astrapy.data_types import DataAPIDate
 from astrapy.info import CollectionDefinition, CollectionVectorOptions, VectorServiceOptions
-from astrapy.constants import VectorMetric
 
 from app.config import settings
 from app.database import get_connected_database
@@ -51,9 +51,7 @@ def build_vectorized_documents(json_data: list[dict[str, Any]]) -> list[dict[str
         {
             **data,
             "due_date": (
-                DataAPIDate.from_string(data["due_date"])
-                if data.get("due_date")
-                else None
+                DataAPIDate.from_string(data["due_date"]) if data.get("due_date") else None
             ),
             "$vectorize": (
                 f"title: {data['title']} | summary: {data['summary']} | genres: {', '.join(data['genres'])}"
@@ -61,5 +59,6 @@ def build_vectorized_documents(json_data: list[dict[str, Any]]) -> list[dict[str
         }
         for data in json_data
     ]
+
 
 # Made with Bob

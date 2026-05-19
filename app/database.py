@@ -3,7 +3,8 @@ AstraDB connection management and repository access.
 """
 
 import logging
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from astrapy import DataAPIClient
 from astrapy.exceptions import DataAPIException
 
@@ -25,8 +26,7 @@ class AstraConnectionManager:
         try:
             self.client = DataAPIClient(settings.astra_db_application_token)
             self.database = self.client.get_database(
-                settings.astra_db_api_endpoint,
-                keyspace=settings.astra_db_keyspace
+                settings.astra_db_api_endpoint, keyspace=settings.astra_db_keyspace
             )
             self._connected = True
             logger.info("Successfully connected to AstraDB")
@@ -117,18 +117,26 @@ class LibraryBookRepository:
 
         return normalized
 
-    async def create_library_book(self, library_book_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def create_library_book(
+        self, library_book_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """Create a new library book document in the collection."""
         try:
             collection = self._ensure_collection()
             document = dict(library_book_data)
-            
+
             # Add $vectorize field for embedding generation (same as ingestion flow)
             # Uses title, summary and genres fields to create embeddings
             if "title" in document and "summary" in document and "genres" in document:
-                genres_str = ", ".join(document["genres"]) if isinstance(document["genres"], list) else str(document["genres"])
-                document["$vectorize"] = f"title: {document['title']} | summary: {document['summary']} | genres: {genres_str}"
-            
+                genres_str = (
+                    ", ".join(document["genres"])
+                    if isinstance(document["genres"], list)
+                    else str(document["genres"])
+                )
+                document["$vectorize"] = (
+                    f"title: {document['title']} | summary: {document['summary']} | genres: {genres_str}"
+                )
+
             result = collection.insert_one(document)
 
             created = collection.find_one({"_id": result.inserted_id})
@@ -185,11 +193,13 @@ class LibraryBookRepository:
             logger.error(f"Unexpected error listing library books: {str(e)}")
             return []
 
-    async def update_library_book(self, library_book_id: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def update_library_book(
+        self, library_book_id: str, update_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """Update a library book document by ID."""
         try:
             collection = self._ensure_collection()
-            
+
             # If title, summary or genres are being updated, regenerate $vectorize field
             if "title" in update_data or "summary" in update_data or "genres" in update_data:
                 # Get current document to access fields not being updated
@@ -198,15 +208,15 @@ class LibraryBookRepository:
                     title = update_data.get("title", current_doc.get("title", ""))
                     summary = update_data.get("summary", current_doc.get("summary", ""))
                     genres = update_data.get("genres", current_doc.get("genres", []))
-                    
+
                     if title and summary and genres:
                         genres_str = ", ".join(genres) if isinstance(genres, list) else str(genres)
-                        update_data["$vectorize"] = f"title: {title} | summary: {summary} | genres: {genres_str}"
-            
+                        update_data["$vectorize"] = (
+                            f"title: {title} | summary: {summary} | genres: {genres_str}"
+                        )
+
             result = collection.find_one_and_update(
-                {"_id": library_book_id},
-                {"$set": update_data},
-                return_document="after"
+                {"_id": library_book_id}, {"$set": update_data}, return_document="after"
             )
 
             if result:
@@ -247,10 +257,7 @@ class LibraryBookRepository:
             return 0
 
     async def search_library_books(
-        self,
-        filter_predicates: Dict[str, Any],
-        skip: int = 0,
-        limit: int = 100
+        self, filter_predicates: Dict[str, Any], skip: int = 0, limit: int = 100
     ) -> tuple[List[Dict[str, Any]], int]:
         """Search library book documents using filter predicates."""
         try:
@@ -267,7 +274,9 @@ class LibraryBookRepository:
                 if len(library_books) >= limit:
                     break
 
-            logger.info(f"Search completed: found {total} documents, returning {len(library_books)}")
+            logger.info(
+                f"Search completed: found {total} documents, returning {len(library_books)}"
+            )
             return library_books, total
 
         except DataAPIException as e:
@@ -282,7 +291,7 @@ class LibraryBookRepository:
         query: str,
         filter_predicates: Optional[Dict[str, Any]] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: int = 100,
     ) -> tuple[List[Dict[str, Any]], int]:
         """Search library book documents semantically using AstraDB vectorize support."""
         try:
@@ -294,7 +303,7 @@ class LibraryBookRepository:
                 filter=predicates,
                 sort={"$vectorize": query},
                 limit=skip + limit,
-                include_similarity=True
+                include_similarity=True,
             )
             library_books = []
 
@@ -305,7 +314,9 @@ class LibraryBookRepository:
                 if len(library_books) >= limit:
                     break
 
-            logger.info(f"Semantic search completed: found {total} documents, returning {len(library_books)}")
+            logger.info(
+                f"Semantic search completed: found {total} documents, returning {len(library_books)}"
+            )
             return library_books, total
 
         except DataAPIException as e:
@@ -320,7 +331,7 @@ class LibraryBookRepository:
         keywords: str,
         filter_predicates: Optional[Dict[str, Any]] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: int = 100,
     ) -> tuple[List[Dict[str, Any]], int]:
         """Search library book documents using lexical keyword matching."""
         try:
@@ -328,32 +339,34 @@ class LibraryBookRepository:
             predicates = filter_predicates or {}
 
             total = collection.count_documents(predicates, upper_bound=1000000)
-            
+
             # Use find_and_rerank with $hybrid in sort for lexical search
             cursor = collection.find_and_rerank(
                 filter=predicates,
                 sort={"$hybrid": keywords},  # Use $hybrid with query text for lexical
                 limit=skip + limit,
-                include_scores=True
+                include_scores=True,
             )
-            
+
             library_books = []
             for index, reranked_result in enumerate(cursor):
                 if index < skip:
                     continue
                 # Extract the document from RerankedResult
                 doc = reranked_result.document
-                
+
                 # Extract scores if available
-                if hasattr(reranked_result, 'scores') and reranked_result.scores:
-                    doc['scores'] = reranked_result.scores
+                if hasattr(reranked_result, "scores") and reranked_result.scores:
+                    doc["scores"] = reranked_result.scores
                     logger.debug(f"Lexical search result {index}: scores={reranked_result.scores}")
-                
+
                 library_books.append(self._normalize_library_book_document(doc))
                 if len(library_books) >= limit:
                     break
 
-            logger.info(f"Lexical search completed: found {total} documents, returning {len(library_books)}")
+            logger.info(
+                f"Lexical search completed: found {total} documents, returning {len(library_books)}"
+            )
             return library_books, total
 
         except DataAPIException as e:
@@ -369,7 +382,7 @@ class LibraryBookRepository:
         keywords: str,
         filter_predicates: Optional[Dict[str, Any]] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: int = 100,
     ) -> tuple[List[Dict[str, Any]], int]:
         """Search library book documents using hybrid vector + lexical search."""
         try:
@@ -377,18 +390,13 @@ class LibraryBookRepository:
             predicates = filter_predicates or {}
 
             total = collection.count_documents(predicates, upper_bound=1000000)
-            
+
             # Use find_and_rerank with $hybrid containing both $vectorize and $lexical
             cursor = collection.find_and_rerank(
                 filter=predicates,
-                sort={
-                    "$hybrid": {
-                        "$vectorize": query,
-                        "$lexical": keywords
-                    }
-                },
+                sort={"$hybrid": {"$vectorize": query, "$lexical": keywords}},
                 limit=skip + limit,
-                include_scores=True
+                include_scores=True,
             )
             library_books = []
 
@@ -397,17 +405,19 @@ class LibraryBookRepository:
                     continue
                 # Extract the document from RerankedResult
                 doc = reranked_result.document
-                
+
                 # Extract scores if available
-                if hasattr(reranked_result, 'scores') and reranked_result.scores:
-                    doc['scores'] = reranked_result.scores
+                if hasattr(reranked_result, "scores") and reranked_result.scores:
+                    doc["scores"] = reranked_result.scores
                     logger.debug(f"Hybrid search result {index}: scores={reranked_result.scores}")
-                
+
                 library_books.append(self._normalize_library_book_document(doc))
                 if len(library_books) >= limit:
                     break
 
-            logger.info(f"Hybrid search completed: found {total} documents, returning {len(library_books)}")
+            logger.info(
+                f"Hybrid search completed: found {total} documents, returning {len(library_books)}"
+            )
             return library_books, total
 
         except DataAPIException as e:

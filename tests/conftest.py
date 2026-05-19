@@ -3,6 +3,7 @@ Pytest configuration and shared fixtures for tests.
 """
 
 import pytest
+
 from app.config import settings
 from app.database import astra_connection_manager, library_book_repository
 
@@ -29,9 +30,9 @@ def setup_database():
 
         collection = astra_connection_manager.ensure_collection(settings.collection_name)
         library_book_repository.set_collection(collection)
-    
+
     yield
-    
+
     # Cleanup after all tests (optional)
     # You can add session-level cleanup logic here if needed
 
@@ -41,23 +42,23 @@ async def cleanup_test_books():
     """
     Fixture to clean up test books created during tests.
     Yields a list to track book IDs, then deletes them after the test.
-    
+
     Usage:
         async def test_something(cleanup_test_books):
             # Create a book
             response = client.post("/api/library-books", json=book_data)
             book_id = response.json()["id"]
-            
+
             # Track it for cleanup
             cleanup_test_books.append(book_id)
-            
+
             # Test continues...
             # Book will be automatically deleted after test completes
     """
     created_book_ids = []
-    
+
     yield created_book_ids
-    
+
     # Cleanup: delete all books created during the test
     for book_id in created_book_ids:
         try:

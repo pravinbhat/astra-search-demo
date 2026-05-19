@@ -5,19 +5,20 @@ FastAPI application entry point.
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import astra_connection_manager, library_book_repository
-from app.routers import health, books
+from app.routers import books, health
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO if not settings.debug else logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     logger.info("Starting up application...")
-    
+
     # Connect to AstraDB and initialize the application collection explicitly
     if astra_connection_manager.connect():
         collection = astra_connection_manager.ensure_collection(settings.collection_name)
@@ -37,9 +38,9 @@ async def lifespan(app: FastAPI):
         logger.info(f"Successfully initialized AstraDB collection: {settings.collection_name}")
     else:
         logger.error("Failed to connect to AstraDB")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down application...")
 
@@ -52,7 +53,7 @@ app = FastAPI(
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
 )
 
 # Configure CORS
@@ -83,11 +84,8 @@ async def root():
     index_file = static_dir / "index.html"
     if index_file.exists():
         return FileResponse(str(index_file))
-    
-    return {
-        "error": "UI not found",
-        "message": "Please check app/static/index.html"
-    }
+
+    return {"error": "UI not found", "message": "Please check app/static/index.html"}
 
 
 @app.get("/api", tags=["Root"])
@@ -99,18 +97,13 @@ async def api_info():
         "message": f"Welcome to {settings.app_name}",
         "version": settings.app_version,
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
 
 
 if __name__ == "__main__":
     import uvicorn
-    
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=settings.debug
-    )
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=settings.debug)
 
 # Made with Bob
