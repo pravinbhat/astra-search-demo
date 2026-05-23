@@ -54,7 +54,7 @@ def build_vectorized_documents(json_data: list[dict[str, Any]]) -> list[dict[str
                 DataAPIDate.from_string(data["due_date"]) if data.get("due_date") else None
             ),
             "$vectorize": (
-                f"title: {data['title']} | summary: {data['summary']} | genres: {', '.join(data['genres'])}"
+                f"title: {data['title']} | author: {data['author']} | summary: {data['summary']} | genres: {', '.join(data['genres'])} | isbn: {data.get('metadata', {}).get('isbn', 'N/A')}"
             ),
         }
         for data in json_data

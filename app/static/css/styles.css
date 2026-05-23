@@ -154,29 +154,6 @@ a:hover {
     margin-left: var(--spacing-sm);
 }
 
-.tagline {
-    color: var(--text-secondary);
-}
-
-.header-nav {
-    display: flex;
-    gap: var(--spacing-lg);
-}
-
-.nav-link {
-    color: var(--text-secondary);
-    font-weight: 500;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
-}
-
-.nav-link:hover {
-    color: var(--primary-color);
-    background: var(--primary-light);
-    text-decoration: none;
-}
-
 .search-modes {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -414,35 +391,6 @@ a:hover {
     background: var(--primary-light);
     border-color: var(--primary-color);
     color: var(--primary-color);
-}
-
-.filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
-}
-
-.filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: var(--primary-light);
-    color: var(--primary-color);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-}
-
-.filter-chip-remove {
-    cursor: pointer;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.filter-chip-remove:hover {
-    color: var(--error-color);
 }
 
 .filter-accordion {
@@ -790,16 +738,6 @@ a:hover {
 .score-rrf {
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: var(--font-size-xs);
-}
-
-.score-rank {
-    color: var(--text-muted);
-}
-
-/* Legacy similarity display (for backward compatibility) */
-.book-similarity {
-    color: var(--text-muted);
     font-size: var(--font-size-xs);
 }
 

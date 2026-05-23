@@ -81,54 +81,11 @@ export function clearComparisonResults() {
     });
 }
 
-export function highlightOverlaps(results) {
-    const booksByMode = {};
-    const allBookIds = new Set();
-    
-    Object.entries(results).forEach(([mode, modeResults]) => {
-        if (modeResults.library_books) {
-            booksByMode[mode] = new Set(
-                modeResults.library_books.map(book => book._id)
-            );
-            modeResults.library_books.forEach(book => allBookIds.add(book._id));
-        }
-    });
-    
-    const overlappingBooks = new Set();
-    allBookIds.forEach(bookId => {
-        let count = 0;
-        Object.values(booksByMode).forEach(modeBooks => {
-            if (modeBooks.has(bookId)) count++;
-        });
-        if (count > 1) {
-            overlappingBooks.add(bookId);
-        }
-    });
-    
-    document.querySelectorAll('.comparison-results-grid .book-card').forEach(card => {
-        const bookId = card.dataset.bookId;
-        if (overlappingBooks.has(bookId)) {
-            card.classList.add('overlapping');
-            
-            if (!card.querySelector('.overlap-indicator')) {
-                const indicator = document.createElement('div');
-                indicator.className = 'overlap-indicator';
-                indicator.title = 'This book appears in multiple search modes';
-                indicator.innerHTML = '🔗';
-                card.appendChild(indicator);
-            }
-        }
-    });
-    
-    return overlappingBooks.size;
-}
-
 export function generateComparisonSummary(results) {
     const summary = {
         totalResults: {},
         responseTimes: {},
-        uniqueBooks: new Set(),
-        overlappingBooks: 0
+        uniqueBooks: new Set()
     };
     
     Object.entries(results).forEach(([mode, modeResults]) => {
@@ -142,29 +99,13 @@ export function generateComparisonSummary(results) {
         }
     });
     
-    summary.overlappingBooks = highlightOverlaps(results);
-    
     return summary;
 }
 
 export function displayComparisonSummary(summary) {
     console.log('Comparison Summary:', {
         totalUniqueBooks: summary.uniqueBooks.size,
-        overlappingBooks: summary.overlappingBooks,
         resultsByMode: summary.totalResults,
         responseTimesByMode: summary.responseTimes
     });
-}
-
-export function exportComparisonResults(results) {
-    const dataStr = JSON.stringify(results, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `comparison-results-${Date.now()}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
 }

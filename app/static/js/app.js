@@ -122,14 +122,12 @@ function setupClearButtonListeners() {
     
     document.getElementById('hybrid-clear-btn')?.addEventListener('click', () => {
         document.getElementById('hybrid-query').value = '';
-        document.getElementById('hybrid-keywords').value = '';
         state.filterBuilders.hybrid.clearFilters();
         SearchResults.clearResults();
     });
     
     document.getElementById('comparison-clear-btn')?.addEventListener('click', () => {
         document.getElementById('comparison-query').value = '';
-        document.getElementById('comparison-keywords').value = '';
         ComparisonView.clearComparisonResults();
         SearchResults.showEmptyState();
     });
@@ -209,13 +207,13 @@ async function handleSemanticSearch() {
 }
 
 async function handleLexicalSearch() {
-    const keywords = document.getElementById('lexical-keywords')?.value.trim();
+    const query = document.getElementById('lexical-keywords')?.value.trim();
     const filterBuilder = state.filterBuilders.lexical;
     const filter = filterBuilder.hasFilters() ? filterBuilder.getFilterPredicates() : null;
     const limit = parseInt(document.getElementById('lexical-results-limit')?.value) || 15;
     
-    if (!keywords) {
-        alert('Please enter keywords');
+    if (!query) {
+        alert('Please enter a search query');
         return;
     }
     
@@ -223,7 +221,7 @@ async function handleLexicalSearch() {
         SearchResults.showLoading();
         SearchResults.showResults();
         
-        const result = await API.lexicalSearch(keywords, filter, 0, limit);
+        const result = await API.lexicalSearch(query, filter, 0, limit);
         
         const resultsGrid = document.getElementById('results-grid');
         SearchResults.renderResults(
@@ -237,7 +235,7 @@ async function handleLexicalSearch() {
         SearchResults.hideLoading();
         SearchResults.scrollToResults();
         
-        state.lastSearchParams = { mode: 'lexical', keywords, filter, limit };
+        state.lastSearchParams = { mode: 'lexical', query, filter, limit };
     } catch (error) {
         SearchResults.hideLoading();
         SearchResults.showError(error.message || 'Search failed. Please try again.');
@@ -247,13 +245,12 @@ async function handleLexicalSearch() {
 
 async function handleHybridSearch() {
     const query = document.getElementById('hybrid-query')?.value.trim();
-    const keywords = document.getElementById('hybrid-keywords')?.value.trim();
     const filterBuilder = state.filterBuilders.hybrid;
     const filter = filterBuilder.hasFilters() ? filterBuilder.getFilterPredicates() : null;
     const limit = parseInt(document.getElementById('hybrid-results-limit')?.value) || 15;
     
-    if (!query || !keywords) {
-        alert('Please enter both a query and keywords for hybrid search');
+    if (!query) {
+        alert('Please enter a search query');
         return;
     }
     
@@ -261,7 +258,7 @@ async function handleHybridSearch() {
         SearchResults.showLoading();
         SearchResults.showResults();
         
-        const result = await API.hybridSearch(query, keywords, filter, 0, limit);
+        const result = await API.hybridSearch(query, query, filter, 0, limit);
         
         const resultsGrid = document.getElementById('results-grid');
         SearchResults.renderResults(
@@ -275,7 +272,7 @@ async function handleHybridSearch() {
         SearchResults.hideLoading();
         SearchResults.scrollToResults();
         
-        state.lastSearchParams = { mode: 'hybrid', query, keywords, filter, limit };
+        state.lastSearchParams = { mode: 'hybrid', query, filter, limit };
     } catch (error) {
         SearchResults.hideLoading();
         SearchResults.showError(error.message || 'Search failed. Please try again.');
@@ -285,11 +282,10 @@ async function handleHybridSearch() {
 
 async function handleComparisonSearch() {
     const query = document.getElementById('comparison-query')?.value.trim();
-    const keywords = document.getElementById('comparison-keywords')?.value.trim();
     const limit = parseInt(document.getElementById('comparison-results-limit')?.value) || 15;
     
-    if (!query && !keywords) {
-        alert('Please enter at least a query or keywords');
+    if (!query) {
+        alert('Please enter a search query');
         return;
     }
     
@@ -297,7 +293,7 @@ async function handleComparisonSearch() {
         SearchResults.showLoading();
         SearchResults.showComparisonResults();
         
-        const results = await API.comparisonSearch(query, keywords, null, limit);
+        const results = await API.comparisonSearch(query, null, limit);
         
         ComparisonView.renderComparisonResults(results, BookDetailsModal.showBookDetails);
         
@@ -307,7 +303,7 @@ async function handleComparisonSearch() {
         SearchResults.hideLoading();
         SearchResults.scrollToResults();
         
-        state.lastSearchParams = { mode: 'comparison', query, keywords, limit };
+        state.lastSearchParams = { mode: 'comparison', query, limit };
     } catch (error) {
         SearchResults.hideLoading();
         SearchResults.showError(error.message || 'Comparison search failed. Please try again.');
@@ -347,32 +343,6 @@ function setupBookAddedListener() {
     });
 }
 
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            
-            // Focus the appropriate input based on current mode
-            const inputs = {
-                filter: null, // Filter mode doesn't have a single input
-                semantic: document.getElementById('semantic-query'),
-                lexical: document.getElementById('lexical-keywords'),
-                hybrid: document.getElementById('hybrid-query'),
-                comparison: document.getElementById('comparison-query')
-            };
-            
-            const input = inputs[state.currentMode];
-            if (input) {
-                input.focus();
-            }
-        }
-        
-        if (e.key === 'Escape') {
-            SearchResults.clearResults();
-        }
-    });
-}
-
 async function checkAPIHealth() {
     try {
         const health = await API.healthCheck();
@@ -385,12 +355,10 @@ async function checkAPIHealth() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         init();
-        setupKeyboardShortcuts();
         checkAPIHealth();
     });
 } else {
     init();
-    setupKeyboardShortcuts();
     checkAPIHealth();
 }
 

@@ -126,15 +126,16 @@ class LibraryBookRepository:
             document = dict(library_book_data)
 
             # Add $vectorize field for embedding generation (same as ingestion flow)
-            # Uses title, summary and genres fields to create embeddings
-            if "title" in document and "summary" in document and "genres" in document:
+            # Uses title, author, summary, genres, and ISBN fields to create embeddings
+            if "title" in document and "author" in document and "summary" in document and "genres" in document:
                 genres_str = (
                     ", ".join(document["genres"])
                     if isinstance(document["genres"], list)
                     else str(document["genres"])
                 )
+                isbn = document.get("metadata", {}).get("isbn", "N/A") if isinstance(document.get("metadata"), dict) else "N/A"
                 document["$vectorize"] = (
-                    f"title: {document['title']} | summary: {document['summary']} | genres: {genres_str}"
+                    f"title: {document['title']} | author: {document['author']} | summary: {document['summary']} | genres: {genres_str} | isbn: {isbn}"
                 )
 
             result = collection.insert_one(document)
@@ -200,19 +201,22 @@ class LibraryBookRepository:
         try:
             collection = self._ensure_collection()
 
-            # If title, summary or genres are being updated, regenerate $vectorize field
-            if "title" in update_data or "summary" in update_data or "genres" in update_data:
+            # If title, author, summary, genres, or metadata are being updated, regenerate $vectorize field
+            if "title" in update_data or "author" in update_data or "summary" in update_data or "genres" in update_data or "metadata" in update_data:
                 # Get current document to access fields not being updated
                 current_doc = collection.find_one({"_id": library_book_id})
                 if current_doc:
                     title = update_data.get("title", current_doc.get("title", ""))
+                    author = update_data.get("author", current_doc.get("author", ""))
                     summary = update_data.get("summary", current_doc.get("summary", ""))
                     genres = update_data.get("genres", current_doc.get("genres", []))
+                    metadata = update_data.get("metadata", current_doc.get("metadata", {}))
 
-                    if title and summary and genres:
+                    if title and author and summary and genres:
                         genres_str = ", ".join(genres) if isinstance(genres, list) else str(genres)
+                        isbn = metadata.get("isbn", "N/A") if isinstance(metadata, dict) else "N/A"
                         update_data["$vectorize"] = (
-                            f"title: {title} | summary: {summary} | genres: {genres_str}"
+                            f"title: {title} | author: {author} | summary: {summary} | genres: {genres_str} | isbn: {isbn}"
                         )
 
             result = collection.find_one_and_update(

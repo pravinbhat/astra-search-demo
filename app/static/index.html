@@ -82,7 +82,7 @@
                         <p class="panel-description">Search using natural language queries powered by vector embeddings</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="semantic-query" class="input-label">Natural Language Query</label>
+                        <label for="semantic-query" class="input-label">Query</label>
                         <textarea 
                             id="semantic-query" 
                             class="search-textarea" 
@@ -90,7 +90,7 @@
                             rows="3"
                             aria-describedby="semantic-help"
                         ></textarea>
-                        <p id="semantic-help" class="input-help">Describe what you're looking for in natural language</p>
+                        <p id="semantic-help" class="input-help">Enter the query to use for this search</p>
                     </div>
                     <details class="filter-accordion">
                         <summary>Optional: Add Metadata Filters</summary>
@@ -120,7 +120,7 @@
                         <p class="panel-description">Traditional keyword-based search with exact matching</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="lexical-keywords" class="input-label">Keywords</label>
+                        <label for="lexical-keywords" class="input-label">Query</label>
                         <input 
                             id="lexical-keywords" 
                             type="text" 
@@ -128,7 +128,7 @@
                             placeholder="e.g., dystopian survival quantum"
                             aria-describedby="lexical-help"
                         />
-                        <p id="lexical-help" class="input-help">Enter keywords to match in book titles, authors, and summaries</p>
+                        <p id="lexical-help" class="input-help">Enter the query to use for this search</p>
                     </div>
                     <details class="filter-accordion">
                         <summary>Optional: Add Metadata Filters</summary>
@@ -158,22 +158,13 @@
                         <p class="panel-description">Combine semantic understanding with keyword precision</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="hybrid-query" class="input-label">Semantic Query</label>
-                        <textarea 
-                            id="hybrid-query" 
-                            class="search-textarea" 
+                        <label for="hybrid-query" class="input-label">Query</label>
+                        <textarea
+                            id="hybrid-query"
+                            class="search-textarea"
                             placeholder="e.g., books about space exploration and adventure"
                             rows="2"
                         ></textarea>
-                    </div>
-                    <div class="search-input-group">
-                        <label for="hybrid-keywords" class="input-label">Keywords</label>
-                        <input 
-                            id="hybrid-keywords" 
-                            type="text" 
-                            class="search-input" 
-                            placeholder="e.g., Mars mission alien"
-                        />
                     </div>
                     <details class="filter-accordion">
                         <summary>Optional: Add Metadata Filters</summary>
@@ -210,15 +201,6 @@
                             placeholder="e.g., books about resilience and survival"
                             rows="2"
                         ></textarea>
-                    </div>
-                    <div class="search-input-group">
-                        <label for="comparison-keywords" class="input-label">Keywords (for lexical/hybrid)</label>
-                        <input 
-                            id="comparison-keywords" 
-                            type="text" 
-                            class="search-input" 
-                            placeholder="e.g., dystopian survival"
-                        />
                     </div>
                     <div class="search-actions">
                         <div class="results-limit-control">

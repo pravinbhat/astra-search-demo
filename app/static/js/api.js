@@ -126,84 +126,52 @@ export async function createBook(bookData) {
     });
 }
 
-export async function getBook(bookId) {
-    return apiRequest(`/${bookId}`, {
-        method: 'GET',
-    });
-}
-
-export async function updateBook(bookId, bookData) {
-    return apiRequest(`/${bookId}`, {
-        method: 'PUT',
-        body: JSON.stringify(bookData),
-    });
-}
-
-export async function deleteBook(bookId) {
-    return apiRequest(`/${bookId}`, {
-        method: 'DELETE',
-    });
-}
-
-export async function listBooks(skip = 0, limit = 100) {
-    return apiRequest(`?skip=${skip}&limit=${limit}`, {
-        method: 'GET',
-    });
-}
-
-export async function comparisonSearch(query, keywords, filter = null, limit = 20) {
+export async function comparisonSearch(query, filter = null, limit = 20) {
+    const hasQuery = query && query.trim();
     const searches = [];
     
-    if (query && query.trim()) {
+    if (hasQuery) {
         searches.push(
             semanticSearch(query, filter, 0, limit)
                 .then(result => ({ mode: 'semantic', ...result }))
                 .catch(error => ({ mode: 'semantic', error: error.message, library_books: [], total: 0 }))
         );
-    } else {
         searches.push(
-            Promise.resolve({ 
-                mode: 'semantic', 
-                library_books: [], 
-                total: 0, 
-                responseTime: 0,
-                message: 'No query provided'
-            })
-        );
-    }
-    
-    if (keywords && keywords.trim()) {
-        searches.push(
-            lexicalSearch(keywords, filter, 0, limit)
+            lexicalSearch(query, filter, 0, limit)
                 .then(result => ({ mode: 'lexical', ...result }))
                 .catch(error => ({ mode: 'lexical', error: error.message, library_books: [], total: 0 }))
         );
-    } else {
         searches.push(
-            Promise.resolve({ 
-                mode: 'lexical', 
-                library_books: [], 
-                total: 0, 
-                responseTime: 0,
-                message: 'No keywords provided'
-            })
-        );
-    }
-    
-    if (query && query.trim() && keywords && keywords.trim()) {
-        searches.push(
-            hybridSearch(query, keywords, filter, 0, limit)
+            hybridSearch(query, query, filter, 0, limit)
                 .then(result => ({ mode: 'hybrid', ...result }))
                 .catch(error => ({ mode: 'hybrid', error: error.message, library_books: [], total: 0 }))
         );
     } else {
         searches.push(
-            Promise.resolve({ 
-                mode: 'hybrid', 
-                library_books: [], 
-                total: 0, 
+            Promise.resolve({
+                mode: 'semantic',
+                library_books: [],
+                total: 0,
                 responseTime: 0,
-                message: 'Both query and keywords required'
+                message: 'No query provided'
+            })
+        );
+        searches.push(
+            Promise.resolve({
+                mode: 'lexical',
+                library_books: [],
+                total: 0,
+                responseTime: 0,
+                message: 'No query provided'
+            })
+        );
+        searches.push(
+            Promise.resolve({
+                mode: 'hybrid',
+                library_books: [],
+                total: 0,
+                responseTime: 0,
+                message: 'No query provided'
             })
         );
     }

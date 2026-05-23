@@ -42,6 +42,18 @@ function renderGenres(genres) {
 }
 
 function renderCheckoutStatus(book) {
+    const metadataHtml = [];
+    
+    if (book.metadata?.isbn) {
+        metadataHtml.push(`<p><strong>ISBN:</strong> ${book.metadata.isbn}</p>`);
+    }
+    if (book.metadata?.language) {
+        metadataHtml.push(`<p><strong>Language:</strong> ${book.metadata.language}</p>`);
+    }
+    if (book.metadata?.edition) {
+        metadataHtml.push(`<p><strong>Edition:</strong> ${book.metadata.edition}</p>`);
+    }
+    
     if (book.is_checked_out) {
         const dueDate = book.due_date ? new Date(book.due_date).toLocaleDateString() : 'Unknown';
         const borrower = book.borrower || 'Unknown';
@@ -54,14 +66,22 @@ function renderCheckoutStatus(book) {
                 <div class="checkout-details">
                     <p><strong>Borrower:</strong> ${borrower}</p>
                     <p><strong>Due Date:</strong> ${dueDate}</p>
+                    ${metadataHtml.join('')}
                 </div>
             </div>
         `;
     }
     return `
         <div class="checkout-info available">
-            <span class="status-icon">✓</span>
-            <span class="status-text">Available</span>
+            <div class="checkout-status">
+                <span class="status-icon">✓</span>
+                <span class="status-text">Available</span>
+            </div>
+            ${metadataHtml.length > 0 ? `
+                <div class="checkout-details">
+                    ${metadataHtml.join('')}
+                </div>
+            ` : ''}
         </div>
     `;
 }
@@ -149,6 +169,11 @@ function createBookDetailsModal(book) {
                             ${renderGenres(book.genres)}
                         </div>
                     </div>
+
+                    <div class="detail-section">
+                        <h3>Availability</h3>
+                        ${renderCheckoutStatus(book)}
+                    </div>
                 </div>
                 
                 <div class="book-details-sidebar">
@@ -168,30 +193,25 @@ function createBookDetailsModal(book) {
                                 <span class="info-label">Pages:</span>
                                 <span class="info-value">${book.number_of_pages}</span>
                             </div>
-                            ${book.isbn ? `
+                            ${book.metadata?.isbn ? `
                                 <div class="info-item">
                                     <span class="info-label">ISBN:</span>
-                                    <span class="info-value">${book.isbn}</span>
+                                    <span class="info-value">${book.metadata.isbn}</span>
                                 </div>
                             ` : ''}
-                            ${book.language ? `
+                            ${book.metadata?.language ? `
                                 <div class="info-item">
                                     <span class="info-label">Language:</span>
-                                    <span class="info-value">${book.language}</span>
+                                    <span class="info-value">${book.metadata.language}</span>
                                 </div>
                             ` : ''}
-                            ${book.edition ? `
+                            ${book.metadata?.edition ? `
                                 <div class="info-item">
                                     <span class="info-label">Edition:</span>
-                                    <span class="info-value">${book.edition}</span>
+                                    <span class="info-value">${book.metadata.edition}</span>
                                 </div>
                             ` : ''}
                         </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h3>Availability</h3>
-                        ${renderCheckoutStatus(book)}
                     </div>
                     
                     ${renderSearchRelevance(book)}
