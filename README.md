@@ -4,6 +4,8 @@ A demo app for AI-powered search workloads using [AstraDB's](https://astra.datas
 
 Built on AstraDB’s native [Data API](https://docs.datastax.com/en/astra-db-serverless/api-reference/dataapiclient.html) and [Apache Cassandra®](https://cassandra.apache.org/) foundation, this project implements a library book search application to showcase advanced retrieval topologies: semantic, lexical, metadata-filtered, and hybrid search.
 
+Semantic search is useful for meaning-based discovery, but lexical search is also important for keyword-oriented terms that may not rank well in a purely semantic workflow. In this app, lexical and hybrid search are especially helpful when searching for exact or near-exact book terms such as author names and ISBN values.
+
 The application interacts with a `library_books` collection leveraging AstraDB's native `$vectorize` feature. It [automatically generates and stores embeddings](https://docs.datastax.com/en/astra-db-serverless/databases/embedding-generation.html) (using book summaries and genre metadata) within the SaaS database layer, while utilizing native server-side reranking and hybrid workflows to maximize search accuracy.
 
 ## Quick Start
@@ -100,10 +102,10 @@ Notes:
 
 This project includes a **modern web UI** built with vanilla JavaScript that provides:
 
-- 🔍 **Filter Search** - Dynamic filter builder for metadata-based queries
-- 🧠 **Semantic Search** - Natural language queries using vector embeddings
-- 📝 **Lexical Search** - Traditional keyword-based search
-- ⚡ **Hybrid Search** - Combined semantic and lexical search
+- 🔍 **Filter Search** - Dynamic filter builder for metadata-based queries by author, genres, rating, publication year, checkout status, and more
+- 🧠 **Semantic Search** - Natural language queries using vector embeddings using AstraDB's `$vectorize` feature
+- 📝 **Lexical Search** - Traditional keyword-based search using AstraDB's `$lexical` operator for indexed terms that benefit from exact keyword matching
+- ⚡ **Hybrid Search** - Combined semantic and lexical search for broad intent plus exact term matching using `$hybrid` for a balanced mix of semantic relevance and keyword precision
 - 📊 **Comparison Mode** - Side-by-side results from all search modes
 
 **Access the UI**: Start the server and navigate to `http://localhost:8000`
@@ -116,19 +118,6 @@ This project includes a **modern web UI** built with vanilla JavaScript that pro
 *Click images to learn more in the [UI Guide](UI.md)*
 
 See [UI.md](UI.md) for complete UI documentation.
-
-
-## What this demo includes:
-
-- ✅ Semantic vector search using AstraDB's `$vectorize` feature
-- ✅ Lexical keyword search using AstraDB's `$lexical` operator
-- ✅ Hybrid search combining vector and lexical search using `$hybrid`
-- ✅ Filter-based search with predicate operators
-- ✅ Semantic filter search combining vector search with metadata filters
-- ✅ Lexical filter search combining keyword matching with metadata filters
-- ✅ Hybrid filter search combining all search modes
-- ✅ Metadata filtering by author, genres, rating, publication year, checkout status, and more
-
 See [SEARCH_API.md](SEARCH_API.md) for complete search endpoint documentation.
 
 ## Resources

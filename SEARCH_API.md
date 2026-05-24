@@ -2,6 +2,8 @@
 
 Search endpoint for querying library books using filters, semantic, lexical, or hybrid search. For the web UI, see [UI.md](UI.md).
 
+Semantic search is best for meaning-based discovery, while lexical search helps match indexed keyword-oriented terms that may otherwise be missed or deprioritized in semantic-only retrieval. In this app, lexical search is particularly useful for exact or near-exact book identifiers such as author names and ISBN values, and hybrid search is a strong default when you want both semantic relevance and keyword precision.
+
 **Endpoint:** `POST /api/library-books/search`
 
 ## Search Modes
@@ -180,6 +182,8 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
 
 ### 3. Lexical Search by Keywords
 
+Useful when you want to search for indexed terms that should match directly, such as an author name or ISBN.
+
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \
   -H "Content-Type: application/json" \
@@ -191,6 +195,8 @@ curl -X POST "http://localhost:8000/api/library-books/search" \
 ```
 
 ### 4. Hybrid Search (Vector + Lexical)
+
+Useful when you want semantic understanding of the request while also preserving keyword matching.
 
 ```bash
 curl -X POST "http://localhost:8000/api/library-books/search" \

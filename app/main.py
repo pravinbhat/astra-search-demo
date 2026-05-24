@@ -76,7 +76,7 @@ if static_dir.exists():
     logger.info(f"Mounted static files from {static_dir}")
 
 
-@app.get("/", tags=["UI"])
+@app.get("/", include_in_schema=False)
 async def root():
     """
     Serve the UI.
@@ -86,19 +86,6 @@ async def root():
         return FileResponse(str(index_file))
 
     return {"error": "UI not found", "message": "Please check app/static/index.html"}
-
-
-@app.get("/api", tags=["Root"])
-async def api_info():
-    """
-    Return API information.
-    """
-    return {
-        "message": f"Welcome to {settings.app_name}",
-        "version": settings.app_version,
-        "docs": "/docs",
-        "health": "/health",
-    }
 
 
 if __name__ == "__main__":

@@ -37,17 +37,6 @@ class TestRootEndpoint:
         assert response.headers["content-type"] == "text/html; charset=utf-8"
         assert b"<!DOCTYPE html>" in response.content or b"<html" in response.content
 
-    def test_api_info(self):
-        """Test API info endpoint returns welcome message."""
-        response = client.get("/api")
-        assert response.status_code == 200
-
-        data = response.json()
-        assert "message" in data
-        assert "version" in data
-        assert "docs" in data
-        assert "health" in data
-
 
 class TestLibraryBooksEndpoint:
     """Tests for library_book CRUD endpoints."""

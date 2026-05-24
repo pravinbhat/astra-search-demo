@@ -15,7 +15,7 @@ REST API endpoints for the `library_books` collection.
 | DELETE | `/api/library-books/{id}` | Delete a library book | 204, 404 |
 | POST | `/api/library-books/search` | Search library books | 200, 500 |
 
-> **Note:** For detailed documentation on the search endpoint including filter search, semantic search, semantic filter search, operators, and examples, see [SEARCH_API.md](SEARCH_API.md).
+> **Note:** For detailed documentation on the search endpoint including semantic search, lexical search, hybrid search, operators, and examples, see [SEARCH_API.md](SEARCH_API.md).
 
 ## Entity shape
 
