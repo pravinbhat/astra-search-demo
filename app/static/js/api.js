@@ -22,16 +22,21 @@ async function apiRequest(endpoint, options = {}) {
     
     try {
         const response = await fetch(url, config);
-        const data = await response.json();
-        
+
+        let data = null;
+        if (response.status !== 204) {
+            const responseText = await response.text();
+            data = responseText ? JSON.parse(responseText) : null;
+        }
+
         if (!response.ok) {
             throw new APIError(
-                data.detail || 'An error occurred',
+                data?.detail || 'An error occurred',
                 response.status,
                 data
             );
         }
-        
+
         return data;
     } catch (error) {
         if (error instanceof APIError) {
@@ -123,6 +128,19 @@ export async function createBook(bookData) {
     return apiRequest('', {
         method: 'POST',
         body: JSON.stringify(bookData),
+    });
+}
+
+export async function updateBook(bookId, bookData) {
+    return apiRequest(`/${bookId}`, {
+        method: 'PUT',
+        body: JSON.stringify(bookData),
+    });
+}
+
+export async function deleteBook(bookId) {
+    return apiRequest(`/${bookId}`, {
+        method: 'DELETE',
     });
 }
 

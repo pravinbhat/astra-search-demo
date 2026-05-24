@@ -7,7 +7,7 @@ name = "astra-search-demo"
 version = "1.0.0"
 description = "A FastAPI application with AstraDB Data API for CRUD operations"
 readme = "README.md"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.13,<3.14"
 license = {text = "Apache-2.0"}
 authors = [
     {name = "Pravin Bhat", email = "pravinbhat@example.com"}

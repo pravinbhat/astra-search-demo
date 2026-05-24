@@ -11,6 +11,48 @@ const state = {
     lastSearchParams: null
 };
 
+function createBookDetailsHandler() {
+    return (book) => {
+        BookDetailsModal.showBookDetails(book, {
+            onBookUpdated: handleBookMutation,
+            onBookDeleted: handleBookMutation,
+        });
+    };
+}
+
+async function handleBookMutation() {
+    if (!state.lastSearchParams) {
+        SearchResults.clearResults();
+        return;
+    }
+
+    const { mode } = state.lastSearchParams;
+
+    if (mode === 'comparison') {
+        await handleComparisonSearch();
+        return;
+    }
+
+    if (mode === 'filter') {
+        await handleFilterSearch();
+        return;
+    }
+
+    if (mode === 'semantic') {
+        await handleSemanticSearch();
+        return;
+    }
+
+    if (mode === 'lexical') {
+        await handleLexicalSearch();
+        return;
+    }
+
+    if (mode === 'hybrid') {
+        await handleHybridSearch();
+    }
+}
+
 function init() {
     console.log('Initializing Astra Search Demo...');
     
@@ -155,7 +197,7 @@ async function handleFilterSearch() {
             result.library_books,
             result.total,
             result.responseTime,
-            BookDetailsModal.showBookDetails
+            createBookDetailsHandler()
         );
         
         SearchResults.hideLoading();
@@ -192,7 +234,7 @@ async function handleSemanticSearch() {
             result.library_books,
             result.total,
             result.responseTime,
-            BookDetailsModal.showBookDetails
+            createBookDetailsHandler()
         );
         
         SearchResults.hideLoading();
@@ -229,7 +271,7 @@ async function handleLexicalSearch() {
             result.library_books,
             result.total,
             result.responseTime,
-            BookDetailsModal.showBookDetails
+            createBookDetailsHandler()
         );
         
         SearchResults.hideLoading();
@@ -266,7 +308,7 @@ async function handleHybridSearch() {
             result.library_books,
             result.total,
             result.responseTime,
-            BookDetailsModal.showBookDetails
+            createBookDetailsHandler()
         );
         
         SearchResults.hideLoading();
@@ -295,7 +337,7 @@ async function handleComparisonSearch() {
         
         const results = await API.comparisonSearch(query, null, limit);
         
-        ComparisonView.renderComparisonResults(results, BookDetailsModal.showBookDetails);
+        ComparisonView.renderComparisonResults(results, createBookDetailsHandler());
         
         const summary = ComparisonView.generateComparisonSummary(results);
         ComparisonView.displayComparisonSummary(summary);
