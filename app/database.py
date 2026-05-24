@@ -344,10 +344,10 @@ class LibraryBookRepository:
 
             total = collection.count_documents(predicates, upper_bound=1000000)
 
-            # Use find_and_rerank with $hybrid in sort for lexical search
+            # Use find_and_rerank with $lexical in sort for lexical search
             cursor = collection.find_and_rerank(
                 filter=predicates,
-                sort={"$hybrid": keywords},  # Use $hybrid with query text for lexical
+                sort={"$lexical": keywords},  # Use $lexical for pure lexical search
                 limit=skip + limit,
                 include_scores=True,
             )

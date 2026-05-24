@@ -8,15 +8,15 @@ Semantic search is best for meaning-based discovery, while lexical search helps 
 
 ## Search Modes
 
-| Mode                       | Use Case                                        | Request Fields          | Example                                     |
-| ----------------------------| -------------------------------------------------| ------------------------| ---------------------------------------------|
-| **Filter Search**          | Query by metadata (author, genre, rating, etc.) | `filter` only           | Find all books by "John Anthony"            |
-| **Semantic Search**        | Query by meaning/concepts                       | `query` only            | Find "books about resilience and survival"  |
-| **Lexical Search**         | Query by keyword matching                       | `keywords` only         | Find books with "dystopian survival"        |
-| **Hybrid Search**          | Combine vector + lexical search                 | `query` + `keywords`    | Find books semantically + keyword match     |
-| **Semantic Filter Search** | Combine semantic + metadata constraints         | `filter` + `query`      | Find sci-fi books about "space exploration" |
-| **Lexical Filter Search**  | Combine lexical + metadata constraints          | `filter` + `keywords`   | Find sci-fi books with "alien planet"       |
-| **Hybrid Filter Search**   | Combine hybrid + metadata constraints           | `filter` + `query` + `keywords` | Find sci-fi books with semantic + lexical |
+| Mode                       | Use Case                                        | Request Fields                  | Example                                     |
+| ----------------------------| -------------------------------------------------| ---------------------------------| ---------------------------------------------|
+| **Filter Search**          | Query by metadata (author, genre, rating, etc.) | `filter` only                   | Find all books by "John Anthony"            |
+| **Semantic Search**        | Query by meaning/concepts                       | `query` only                    | Find "books about resilience and survival"  |
+| **Lexical Search**         | Query by keyword matching                       | `keywords` only                 | Find books with "dystopian survival"        |
+| **Hybrid Search**          | Combine vector + lexical search                 | `query` + `keywords`            | Find books semantically + keyword match     |
+| **Semantic Filter Search** | Combine semantic + metadata constraints         | `filter` + `query`              | Find sci-fi books about "space exploration" |
+| **Lexical Filter Search**  | Combine lexical + metadata constraints          | `filter` + `keywords`           | Find sci-fi books with "alien planet"       |
+| **Hybrid Filter Search**   | Combine hybrid + metadata constraints           | `filter` + `query` + `keywords` | Find sci-fi books with semantic + lexical   |
 
 ## Endpoint
 

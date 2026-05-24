@@ -4,10 +4,13 @@ REST API endpoints for the `library_books` collection.
 
 **Base URL:** `http://localhost:8000`
 
+**Interactive API Documentation:** `http://localhost:8000/docs`
+
 ## Endpoints
 
 | Method | Endpoint | Description | Status Codes |
 |--------|----------|-------------|--------------|
+| GET | `/health` | Health check endpoint | 200 |
 | POST | `/api/library-books` | Create a new library book | 201, 500 |
 | GET | `/api/library-books` | List library books with pagination | 200 |
 | GET | `/api/library-books/{id}` | Get a specific library book | 200, 404 |
