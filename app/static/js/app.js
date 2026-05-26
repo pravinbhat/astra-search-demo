@@ -170,6 +170,7 @@ function setupClearButtonListeners() {
     
     document.getElementById('comparison-clear-btn')?.addEventListener('click', () => {
         document.getElementById('comparison-query').value = '';
+        document.getElementById('comparison-keywords').value = '';
         ComparisonView.clearComparisonResults();
         SearchResults.showEmptyState();
     });
@@ -324,6 +325,7 @@ async function handleHybridSearch() {
 
 async function handleComparisonSearch() {
     const query = document.getElementById('comparison-query')?.value.trim();
+    const keywords = document.getElementById('comparison-keywords')?.value.trim();
     const limit = parseInt(document.getElementById('comparison-results-limit')?.value) || 15;
     
     if (!query) {
@@ -335,7 +337,7 @@ async function handleComparisonSearch() {
         SearchResults.showLoading();
         SearchResults.showComparisonResults();
         
-        const results = await API.comparisonSearch(query, null, limit);
+        const results = await API.comparisonSearch(query, keywords, null, limit);
         
         ComparisonView.renderComparisonResults(results, createBookDetailsHandler());
         
@@ -345,7 +347,7 @@ async function handleComparisonSearch() {
         SearchResults.hideLoading();
         SearchResults.scrollToResults();
         
-        state.lastSearchParams = { mode: 'comparison', query, limit };
+        state.lastSearchParams = { mode: 'comparison', query, keywords, limit };
     } catch (error) {
         SearchResults.hideLoading();
         SearchResults.showError(error.message || 'Comparison search failed. Please try again.');

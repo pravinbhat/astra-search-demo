@@ -144,23 +144,31 @@ export async function deleteBook(bookId) {
     });
 }
 
-export async function comparisonSearch(query, filter = null, limit = 20) {
+export async function comparisonSearch(query, keywords = null, filter = null, limit = 20) {
     const hasQuery = query && query.trim();
+    const hasKeywords = keywords && keywords.trim();
     const searches = [];
     
-    if (hasQuery) {
+    if (hasQuery || hasKeywords) {
+        // Semantic search - always uses query
         searches.push(
             semanticSearch(query, filter, 0, limit)
                 .then(result => ({ mode: 'semantic', ...result }))
                 .catch(error => ({ mode: 'semantic', error: error.message, library_books: [], total: 0 }))
         );
+        
+        // Lexical search - uses keywords if provided, otherwise query
+        const lexicalQuery = hasKeywords ? keywords : query;
         searches.push(
-            lexicalSearch(query, filter, 0, limit)
+            lexicalSearch(lexicalQuery, filter, 0, limit)
                 .then(result => ({ mode: 'lexical', ...result }))
                 .catch(error => ({ mode: 'lexical', error: error.message, library_books: [], total: 0 }))
         );
+        
+        // Hybrid search - uses both query and keywords (or query for both if keywords empty)
+        const hybridKeywords = hasKeywords ? keywords : query;
         searches.push(
-            hybridSearch(query, query, filter, 0, limit)
+            hybridSearch(query, hybridKeywords, filter, 0, limit)
                 .then(result => ({ mode: 'hybrid', ...result }))
                 .catch(error => ({ mode: 'hybrid', error: error.message, library_books: [], total: 0 }))
         );
@@ -180,7 +188,7 @@ export async function comparisonSearch(query, filter = null, limit = 20) {
                 library_books: [],
                 total: 0,
                 responseTime: 0,
-                message: 'No query provided'
+                message: 'No keywords provided'
             })
         );
         searches.push(

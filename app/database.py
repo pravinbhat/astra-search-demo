@@ -134,7 +134,7 @@ class LibraryBookRepository:
                     else str(document["genres"])
                 )
                 isbn = document.get("metadata", {}).get("isbn", "N/A") if isinstance(document.get("metadata"), dict) else "N/A"
-                document["$vectorize"] = (
+                document["$hybrid"] = (
                     f"title: {document['title']} | author: {document['author']} | summary: {document['summary']} | genres: {genres_str} | isbn: {isbn}"
                 )
 
@@ -215,7 +215,7 @@ class LibraryBookRepository:
                     if title and author and summary and genres:
                         genres_str = ", ".join(genres) if isinstance(genres, list) else str(genres)
                         isbn = metadata.get("isbn", "N/A") if isinstance(metadata, dict) else "N/A"
-                        update_data["$vectorize"] = (
+                        update_data["$hybrid"] = (
                             f"title: {title} | author: {author} | summary: {summary} | genres: {genres_str} | isbn: {isbn}"
                         )
 
@@ -344,25 +344,16 @@ class LibraryBookRepository:
 
             total = collection.count_documents(predicates, upper_bound=1000000)
 
-            # Use find_and_rerank with $lexical in sort for lexical search
-            cursor = collection.find_and_rerank(
+            cursor = collection.find(
                 filter=predicates,
-                sort={"$lexical": keywords},  # Use $lexical for pure lexical search
+                sort={"$lexical": keywords},
                 limit=skip + limit,
-                include_scores=True,
             )
-
+ 
             library_books = []
-            for index, reranked_result in enumerate(cursor):
+            for index, doc in enumerate(cursor):
                 if index < skip:
                     continue
-                # Extract the document from RerankedResult
-                doc = reranked_result.document
-
-                # Extract scores if available
-                if hasattr(reranked_result, "scores") and reranked_result.scores:
-                    doc["scores"] = reranked_result.scores
-                    logger.debug(f"Lexical search result {index}: scores={reranked_result.scores}")
 
                 library_books.append(self._normalize_library_book_document(doc))
                 if len(library_books) >= limit:

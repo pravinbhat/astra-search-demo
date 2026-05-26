@@ -120,12 +120,12 @@
                         <p class="panel-description">Traditional keyword-based search with exact matching</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="lexical-keywords" class="input-label">Query</label>
+                        <label for="lexical-keywords" class="input-label">Keywords</label>
                         <input 
                             id="lexical-keywords" 
                             type="text" 
                             class="search-input" 
-                            placeholder="e.g., dystopian survival quantum"
+                            placeholder="e.g., author, isbn"
                             aria-describedby="lexical-help"
                         />
                         <p id="lexical-help" class="input-help">Enter the query to use for this search</p>
@@ -158,11 +158,11 @@
                         <p class="panel-description">Combine semantic understanding with keyword precision</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="hybrid-query" class="input-label">Query</label>
+                        <label for="hybrid-query" class="input-label">Query with Keywords</label>
                         <textarea
                             id="hybrid-query"
                             class="search-textarea"
-                            placeholder="e.g., books about space exploration and adventure"
+                            placeholder="e.g., books about space exploration and adventure by author or ISBN"
                             rows="2"
                         ></textarea>
                     </div>
@@ -194,13 +194,22 @@
                         <p class="panel-description">Run the same query across all search modes and compare results</p>
                     </div>
                     <div class="search-input-group">
-                        <label for="comparison-query" class="input-label">Query</label>
+                        <label for="comparison-query" class="input-label">Query with Keywords</label>
                         <textarea 
                             id="comparison-query" 
                             class="search-textarea" 
-                            placeholder="e.g., books about resilience and survival"
+                            placeholder="e.g., books about resilience and survival by author"
                             rows="2"
                         ></textarea>
+                    </div>
+                    <div class="search-input-group">
+                        <label for="comparison-keywords" class="input-label">Keywords (for lexical)</label>
+                        <input 
+                            id="comparison-keywords" 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="e.g., author, isbn"
+                        />
                     </div>
                     <div class="search-actions">
                         <div class="results-limit-control">
