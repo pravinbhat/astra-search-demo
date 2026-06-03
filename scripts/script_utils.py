@@ -22,15 +22,21 @@ def get_collection(name: str | None = None):
 
 
 def build_collection_definition() -> CollectionDefinition:
-    """Build the vector-enabled collection definition from shared settings."""
-    return CollectionDefinition(
-        vector=CollectionVectorOptions(
-            metric=VectorMetric.COSINE,
-            service=VectorServiceOptions(
-                provider=settings.embedding_provider,
-                model_name=settings.embedding_model_name,
-            ),
-        ),
+    """Build the vector-enabled collection definition with DOT_PRODUCT metric and lexical search."""
+    return (
+        CollectionDefinition.builder()
+        .set_vector_service(settings.embedding_provider, settings.embedding_model_name)
+        .set_vector_metric(VectorMetric.DOT_PRODUCT)
+        .set_lexical({
+            "tokenizer": {"name": "standard", "args": {}},
+            "filters": [
+                {"name": "lowercase"},
+                {"name": "stop"},
+                {"name": "porterstem"},
+                {"name": "asciifolding"},
+            ],
+        })
+        .build()
     )
 
 

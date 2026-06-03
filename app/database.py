@@ -10,6 +10,9 @@ from astrapy.exceptions import DataAPIException
 
 from app.config import settings
 
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
 logger = logging.getLogger(__name__)
 
 
@@ -330,6 +333,17 @@ class LibraryBookRepository:
             logger.error(f"Unexpected error performing semantic search for library books: {str(e)}")
             return [], 0
 
+    def get_lexical_terms_nltk(self, sentence):
+        stop_words = set(stopwords.words('english'))
+        # Tokenize words properly (handles punctuation contextually)
+        words = word_tokenize(sentence.lower())
+        # Keep only alphanumeric words and strip out stop words
+        return [w for w in words if w.isalnum() and w not in stop_words]
+
+    def generate_lexical_json(self, word_list):
+        # Create the list of dictionaries using a list comprehension
+        return [{"$lexical": {"$match": word}} for word in word_list]
+
     async def lexical_search_library_books(
         self,
         keywords: str,
@@ -339,14 +353,22 @@ class LibraryBookRepository:
     ) -> tuple[List[Dict[str, Any]], int]:
         """Search library book documents using lexical keyword matching."""
         try:
-            collection = self._ensure_collection()
+            kword = self.get_lexical_terms_nltk(keywords)
+            kwordJson = self.generate_lexical_json(kword)
+
             predicates = filter_predicates or {}
+            if kwordJson and len(kwordJson) > 1:
+                predicates["$or"] = kwordJson
+            elif kwordJson and len(kwordJson) == 1:
+                predicates = kwordJson[0]
+            else:
+                predicates = {}
+            logger.info(f"Predicates are {predicates} and keywords are {keywords} ")
 
+            collection = self._ensure_collection()
             total = collection.count_documents(predicates, upper_bound=1000000)
-
             cursor = collection.find(
                 filter=predicates,
-                sort={"$lexical": keywords},
                 limit=skip + limit,
             )
  
