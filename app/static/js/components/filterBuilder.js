@@ -387,7 +387,22 @@ export class FilterBuilder {
                 if (!predicates[filter.field]) {
                     predicates[filter.field] = {};
                 }
-                predicates[filter.field][filter.operator] = value;
+                
+                // For $in and $nin operators, merge arrays instead of overwriting
+                if ((filter.operator === '$in' || filter.operator === '$nin') &&
+                    Array.isArray(value)) {
+                    if (predicates[filter.field][filter.operator]) {
+                        // Merge with existing array, avoiding duplicates
+                        const existingValues = predicates[filter.field][filter.operator];
+                        predicates[filter.field][filter.operator] = [
+                            ...new Set([...existingValues, ...value])
+                        ];
+                    } else {
+                        predicates[filter.field][filter.operator] = value;
+                    }
+                } else {
+                    predicates[filter.field][filter.operator] = value;
+                }
             }
         });
         
