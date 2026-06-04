@@ -1,0 +1,67 @@
+<section id="results-section" class="results-section" aria-live="polite" aria-atomic="false">
+    <div id="loading-state" class="loading-state hidden">
+        <div class="spinner"></div>
+        <p>Searching books...</p>
+    </div>
+
+    <div id="error-state" class="error-state hidden" role="alert">
+        <span class="error-icon">⚠️</span>
+        <p id="error-message"></p>
+    </div>
+
+    <div id="empty-state" class="empty-state">
+        <span class="empty-icon">📚</span>
+        <h3>Ready to Search</h3>
+        <p>Select a search mode above and start exploring our library collection</p>
+    </div>
+
+    <div id="results-container" class="results-container hidden">
+        <div id="single-results" class="single-results">
+            <div class="results-header">
+                <h3 id="results-title">Search Results</h3>
+                <div class="results-meta">
+                    <span id="results-count" class="results-count"></span>
+                    <span id="results-time" class="results-time"></span>
+                </div>
+            </div>
+            <div id="results-grid" class="results-grid"></div>
+        </div>
+
+        <div id="comparison-results" class="comparison-results hidden">
+            <div class="comparison-grid">
+                <div class="comparison-column">
+                    <div class="comparison-header">
+                        <h4>Semantic Search</h4>
+                        <div class="comparison-meta">
+                            <span class="comparison-count"></span>
+                            <span class="comparison-time"></span>
+                        </div>
+                    </div>
+                    <div class="comparison-results-grid" data-mode="semantic"></div>
+                </div>
+
+                <div class="comparison-column">
+                    <div class="comparison-header">
+                        <h4>Lexical Search</h4>
+                        <div class="comparison-meta">
+                            <span class="comparison-count"></span>
+                            <span class="comparison-time"></span>
+                        </div>
+                    </div>
+                    <div class="comparison-results-grid" data-mode="lexical"></div>
+                </div>
+
+                <div class="comparison-column">
+                    <div class="comparison-header">
+                        <h4>Hybrid Search</h4>
+                        <div class="comparison-meta">
+                            <span class="comparison-count"></span>
+                            <span class="comparison-time"></span>
+                        </div>
+                    </div>
+                    <div class="comparison-results-grid" data-mode="hybrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

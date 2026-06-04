@@ -1,0 +1,35 @@
+<div id="hybrid-panel" class="search-panel" role="tabpanel" aria-labelledby="hybrid-tab">
+    <div class="panel-header">
+        <h2>Hybrid Search</h2>
+        <p class="panel-description">Combine semantic understanding with keyword precision</p>
+    </div>
+    <div class="search-input-group">
+        <label for="hybrid-query" class="input-label">Query with Keywords</label>
+        <textarea
+            id="hybrid-query"
+            class="search-textarea"
+            placeholder="e.g., books about space exploration and adventure by author or ISBN"
+            rows="2"
+        ></textarea>
+    </div>
+    <details class="filter-accordion">
+        <summary>Optional: Add Metadata Filters</summary>
+        <div id="hybrid-filter-builder" class="filter-builder"></div>
+    </details>
+    <div class="search-actions">
+        <div class="results-limit-control">
+            <label for="hybrid-results-limit" class="limit-label">Results:</label>
+            <select id="hybrid-results-limit" class="limit-selector" aria-label="Number of results to display">
+                <option value="15" selected>15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button id="hybrid-search-btn" class="btn btn-primary">
+            <span class="btn-icon">⚡</span>
+            Hybrid Search
+        </button>
+        <button id="hybrid-clear-btn" class="btn btn-secondary">Clear</button>
+    </div>
+</div>

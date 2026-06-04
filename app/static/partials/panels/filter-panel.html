@@ -1,0 +1,23 @@
+<div id="filter-panel" class="search-panel active" role="tabpanel" aria-labelledby="filter-tab">
+    <div class="panel-header">
+        <h2>Filter Search</h2>
+        <p class="panel-description">Search books using metadata filters (author, genre, rating, etc.)</p>
+    </div>
+    <div id="filter-builder" class="filter-builder"></div>
+    <div class="search-actions">
+        <div class="results-limit-control">
+            <label for="filter-results-limit" class="limit-label">Results:</label>
+            <select id="filter-results-limit" class="limit-selector" aria-label="Number of results to display">
+                <option value="15" selected>15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button id="filter-search-btn" class="btn btn-primary">
+            <span class="btn-icon">🔍</span>
+            Search Books
+        </button>
+        <button id="filter-clear-btn" class="btn btn-secondary">Clear Filters</button>
+    </div>
+</div>

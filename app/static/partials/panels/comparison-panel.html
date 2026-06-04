@@ -1,0 +1,40 @@
+<div id="comparison-panel" class="search-panel" role="tabpanel" aria-labelledby="comparison-tab">
+    <div class="panel-header">
+        <h2>Compare Search Modes</h2>
+        <p class="panel-description">Run the same query across all search modes and compare results</p>
+    </div>
+    <div class="search-input-group">
+        <label for="comparison-query" class="input-label">Query with Keywords</label>
+        <textarea 
+            id="comparison-query" 
+            class="search-textarea" 
+            placeholder="e.g., books about resilience and survival by author"
+            rows="2"
+        ></textarea>
+    </div>
+    <div class="search-input-group">
+        <label for="comparison-keywords" class="input-label">Keywords (for lexical)</label>
+        <input 
+            id="comparison-keywords" 
+            type="text" 
+            class="search-input" 
+            placeholder="e.g., author, isbn"
+        />
+    </div>
+    <div class="search-actions">
+        <div class="results-limit-control">
+            <label for="comparison-results-limit" class="limit-label">Results:</label>
+            <select id="comparison-results-limit" class="limit-selector" aria-label="Number of results to display">
+                <option value="15" selected>15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button id="comparison-search-btn" class="btn btn-primary">
+            <span class="btn-icon">📊</span>
+            Compare All Modes
+        </button>
+        <button id="comparison-clear-btn" class="btn btn-secondary">Clear</button>
+    </div>
+</div>

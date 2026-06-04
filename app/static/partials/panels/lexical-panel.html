@@ -1,0 +1,37 @@
+<div id="lexical-panel" class="search-panel" role="tabpanel" aria-labelledby="lexical-tab">
+    <div class="panel-header">
+        <h2>Lexical Search</h2>
+        <p class="panel-description">Traditional keyword-based search with exact matching</p>
+    </div>
+    <div class="search-input-group">
+        <label for="lexical-keywords" class="input-label">Keywords</label>
+        <input 
+            id="lexical-keywords" 
+            type="text" 
+            class="search-input" 
+            placeholder="e.g., author, isbn"
+            aria-describedby="lexical-help"
+        />
+        <p id="lexical-help" class="input-help">Enter the query to use for this search</p>
+    </div>
+    <details class="filter-accordion">
+        <summary>Optional: Add Metadata Filters</summary>
+        <div id="lexical-filter-builder" class="filter-builder"></div>
+    </details>
+    <div class="search-actions">
+        <div class="results-limit-control">
+            <label for="lexical-results-limit" class="limit-label">Results:</label>
+            <select id="lexical-results-limit" class="limit-selector" aria-label="Number of results to display">
+                <option value="15" selected>15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button id="lexical-search-btn" class="btn btn-primary">
+            <span class="btn-icon">📝</span>
+            Lexical Search
+        </button>
+        <button id="lexical-clear-btn" class="btn btn-secondary">Clear</button>
+    </div>
+</div>

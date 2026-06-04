@@ -1,3 +1,4 @@
+import partialLoader from './partialLoader.js';
 import * as API from './api.js';
 import { FilterBuilder } from './components/filterBuilder.js';
 import * as SearchResults from './components/searchResults.js';
@@ -53,8 +54,38 @@ async function handleBookMutation() {
     }
 }
 
-function init() {
+async function loadPartials() {
+    console.log('Loading HTML partials...');
+    
+    try {
+        await partialLoader.loadPartials([
+            { path: '/static/partials/header.html', target: '#header-container' },
+            { path: '/static/partials/search-modes-tabs.html', target: '#search-modes-container' },
+            { path: '/static/partials/panels/filter-panel.html', target: '#filter-panel-container' },
+            { path: '/static/partials/panels/semantic-panel.html', target: '#semantic-panel-container' },
+            { path: '/static/partials/panels/lexical-panel.html', target: '#lexical-panel-container' },
+            { path: '/static/partials/panels/hybrid-panel.html', target: '#hybrid-panel-container' },
+            { path: '/static/partials/panels/comparison-panel.html', target: '#comparison-panel-container' },
+            { path: '/static/partials/results-section.html', target: '#results-section-container' },
+            { path: '/static/partials/add-book-modal.html', target: '#add-book-modal-container' },
+            { path: '/static/partials/footer.html', target: '#footer-container' }
+        ]);
+        
+        // Wait for next tick to ensure DOM is fully updated
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        console.log('HTML partials loaded successfully');
+    } catch (error) {
+        console.error('Failed to load HTML partials:', error);
+        throw error;
+    }
+}
+
+async function init() {
     console.log('Initializing Astra Search Demo...');
+    
+    // Load HTML partials first
+    await loadPartials();
     
     // Initialize filter builders for each mode
     state.filterBuilders = {
@@ -397,13 +428,12 @@ async function checkAPIHealth() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        init();
+    document.addEventListener('DOMContentLoaded', async () => {
+        await init();
         checkAPIHealth();
     });
 } else {
-    init();
-    checkAPIHealth();
+    init().then(() => checkAPIHealth());
 }
 
 window.AstraSearchDemo = {
