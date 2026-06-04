@@ -72,7 +72,7 @@ class TestLibraryBooksEndpoint:
             "is_checked_out": False,
             "borrower": None,
             "due_date": None,
-            "$vectorize": "summary: A test book for unit testing. | genres: Fiction, Test",
+            "$hybrid": "summary: A test book for unit testing. | genres: Fiction, Test",
         }
 
         response = client.post("/api/library-books", json=library_book_data)
@@ -107,7 +107,7 @@ class TestLibraryBooksEndpoint:
             "is_checked_out": False,
             "borrower": None,
             "due_date": None,
-            "$vectorize": "summary: A test book. | genres: Fiction",
+            "$hybrid": "summary: A test book. | genres: Fiction",
         }
         create_response = client.post("/api/library-books", json=library_book_data)
         library_book_id = create_response.json()["id"]
@@ -140,7 +140,7 @@ class TestLibraryBooksEndpoint:
             "is_checked_out": False,
             "borrower": None,
             "due_date": None,
-            "$vectorize": "summary: Original summary. | genres: Fiction",
+            "$hybrid": "summary: Original summary. | genres: Fiction",
         }
         create_response = client.post("/api/library-books", json=library_book_data)
         library_book_id = create_response.json()["id"]
@@ -177,7 +177,7 @@ class TestLibraryBooksEndpoint:
             "is_checked_out": False,
             "borrower": None,
             "due_date": None,
-            "$vectorize": "summary: To be deleted. | genres: Fiction",
+            "$hybrid": "summary: To be deleted. | genres: Fiction",
         }
         create_response = client.post("/api/library-books", json=library_book_data)
         library_book_id = create_response.json()["id"]
