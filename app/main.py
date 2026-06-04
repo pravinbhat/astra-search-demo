@@ -5,6 +5,8 @@ FastAPI application entry point.
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
+import os
+import nltk
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -74,6 +76,11 @@ static_dir = Path(__file__).parent / "static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     logger.info(f"Mounted static files from {static_dir}")
+
+# Load NLTK data from a custom directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+custom_nltk_path = os.path.join(BASE_DIR, '../data/nltk_data')
+nltk.data.path.append(custom_nltk_path)
 
 
 @app.get("/", include_in_schema=False)
