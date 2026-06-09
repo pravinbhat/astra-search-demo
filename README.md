@@ -15,14 +15,20 @@ The application interacts with a `library_books` collection leveraging AstraDB's
 ./setup.sh
 # Edit .env with your AstraDB credentials
 
-# 2. Create collection and load data
+# 2. Activate python virtual environment:
+   source venv/bin/activate        # bash/zsh
+   source venv/bin/activate.fish   # fish
+
+# 3. Edit .env file with your AstraDB credentials
+
+# 4. Create collection and load data
 python -m scripts.db_create_collection
 python -m scripts.db_hydrate_collection
 
-# 3. Run the application
+# 5. Run the application
 uvicorn app.main:app --reload
 
-# 4. Open your browser
+# 6. Open your browser
 # Navigate to http://localhost:8000
 ```
 
